@@ -1,6 +1,9 @@
-package org.tool.teacher;
+package org.tool.reponse;
 
 import org.springframework.stereotype.Component;
+
+
+
 
 @Component
 public class ResponseMessage {

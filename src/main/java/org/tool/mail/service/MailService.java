@@ -1,4 +1,4 @@
-package org.tool.teacher;
+package org.tool.mail.service;
 
 import java.util.Properties;
 

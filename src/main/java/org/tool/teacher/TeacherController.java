@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.tool.mail.service.MailService;
+import org.tool.reponse.ResponseMessage;
 
 
 
@@ -26,7 +28,7 @@ public class TeacherController {
 	private TeacherRepository tRepo;
 	
 	@Autowired
-	private SubjectRepository sRepo;
+	private TeacherSubjectRepository sRepo;
 	
 	@Autowired
 	private ResponseMessage resp;
@@ -35,13 +37,15 @@ public class TeacherController {
 	
 	
 	
-	
-	@GetMapping("/register")
-	public String check() {
-		
-		System.out.println("got get req");
-		return "Got get!!";
+
+
+	@GetMapping("/list/teacher")
+	public List<TeacherEntity> getAllTeacherEntities() {
+		List<TeacherEntity> t =  new ArrayList<TeacherEntity>();
+		tRepo.findAll().forEach(t::add);
+		return  t;
 	}
+
 	
 	
 	
@@ -59,9 +63,9 @@ public class TeacherController {
 			
 			teacher.setId(Integer.parseInt(java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", "")));
 			
-			List<SubjectEntity> list  =  new ArrayList<SubjectEntity>();
-			for (SubjectEntity s : teacher.getSubjectList()) {
-				SubjectEntity subject = new SubjectEntity();
+			List<TeacherSubjectEntity> list  =  new ArrayList<TeacherSubjectEntity>();
+			for (TeacherSubjectEntity s : teacher.getSubjectList()) {
+				TeacherSubjectEntity subject = new TeacherSubjectEntity();
 				subject.setId( s.getName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", "") );
 				subject.setName( s.getName() );
 				subject.setTeacher(teacher);
@@ -73,7 +77,7 @@ public class TeacherController {
 			
 			teacher.setPassword(RandomStringUtils.random(10, true, true));
 			
-			MailService.send(teacher.getEmail(), "Registration Successful ", " Your user_id : " + teacher.getEmail() +  "  password : " + teacher.getPassword());
+			//MailService.send(teacher.getEmail(), "Registration Successful ", " Your user_id : " + teacher.getEmail() +  "  password : " + teacher.getPassword());
 			
 			tRepo.save(teacher);
 			

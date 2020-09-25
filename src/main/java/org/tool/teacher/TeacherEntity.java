@@ -9,12 +9,18 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 
 
 
 
 @Entity
-@Table(name = "teacher_details")
+@Table(name = "teachers")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class TeacherEntity {
 	
 	//unique_id(auto-generated-java),name,phone,email,password,registrationStatus	
@@ -40,7 +46,7 @@ public class TeacherEntity {
 	@OneToMany(mappedBy = "teacher_id", cascade = {
 		        CascadeType.ALL
 		    })
-	 private List< SubjectEntity > subjectList;
+	 private List< TeacherSubjectEntity > subjectList;
 	
 	
 	
@@ -54,7 +60,7 @@ public class TeacherEntity {
 	
 
 	public TeacherEntity( long teacher_id, String name, String email, long phone, String password, 
-			List<SubjectEntity> subjectList) {
+			List<TeacherSubjectEntity> subjectList) {
 		this.teacher_id = teacher_id;
 		this.name = name;
 		this.email = email;
@@ -108,20 +114,20 @@ public class TeacherEntity {
 	}
 
 
-	public List<SubjectEntity> getSubjectList() {
+	public List<TeacherSubjectEntity> getSubjectList() {
 		return subjectList;
 	}
 
 
-	public void setSubjects(List<SubjectEntity> subjectList) {
+	public void setSubjects(List<TeacherSubjectEntity> subjectList) {
 		this.subjectList = subjectList;
 	}
 	
-	public void addSubject(SubjectEntity subject) {
+	public void addSubject(TeacherSubjectEntity subject) {
 		this.subjectList.add(subject);
 	}
 	
-	public void removeSubject(SubjectEntity subject) {
+	public void removeSubject(TeacherSubjectEntity subject) {
 		this.subjectList.remove(subject);
 	}
 

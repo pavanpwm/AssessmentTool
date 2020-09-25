@@ -8,9 +8,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
-@Table(name = "subjects")
-public class SubjectEntity {
+@Table(name = "teacher_subjects")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
+public class TeacherSubjectEntity {
 	
 	@Id
 	@Column(name = "id")
@@ -18,25 +24,26 @@ public class SubjectEntity {
 	
 	@Column(name = "name")
 	private String name;
-	
-	
+
 	
 	@ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "teacher_id")
     private TeacherEntity teacher_id;
+	
+	
 
 	
 	
 	
-	public SubjectEntity() {
+	public TeacherSubjectEntity() {
 	}
 	
 	
-	public SubjectEntity(String name) {
+	public TeacherSubjectEntity(String name) {
 		this.name = name;
 	}
 
-	public SubjectEntity(String id, String name, TeacherEntity teacher_id) {
+	public TeacherSubjectEntity(String id, String name, TeacherEntity teacher_id) {
 		this.id = id;
 		this.name = name;
 		this.teacher_id = teacher_id;

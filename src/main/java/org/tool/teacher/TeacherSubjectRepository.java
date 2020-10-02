@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TeacherSubjectRepository extends CrudRepository<TeacherSubjectEntity, String> {
 	
-	boolean existsTeacherSubjectEntityById(String id);
+	boolean existsTeacherSubjectEntityById(String id);				// checks if a subject exists
 	
-	TeacherSubjectEntity findTeacherSubjectEntityById(String id);
+	TeacherSubjectEntity findTeacherSubjectEntityById(String id);   // takes in subject_id and return a subject if exists
+		
 	
-
 }

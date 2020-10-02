@@ -1,77 +1,93 @@
 package org.tool.student;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import javax.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 
 
 
 /*
+ * 
  
-Now, we are using a new annotation @JsonIdentityInfo. In the previous articles, we have StackOverflow errors due to circular references. 
-We have been using @JsonIgnore, @JsonManagedReference, and @JsonBackReference to take care of the error. This new annotation, @JsonIdentityInfo,
-will handle the circular reference errors for us.
-
+ @JsonInclude(Include.NON_EMPTY)  is the most important for these two - many to many related entities.
+ I tried using other annotations such as managed reference, back reference, identify info etc.
+ But using them were bad referenced results. If not used then infinite references.
+ So, now I am using json include annotation and manually clear references to tackle infinite references in the controller itself.
+ In this way I can even ignore fields that I dont want more dynamically than when using json ignore.
+ 
+  
+ * 
  */
 
 
 
-@Entity
-@Table(name = "students")
 
+@Entity
+@Table(name = "student")
+@JsonInclude(Include.NON_EMPTY)       
 public class StudentEntity {
 	
 
 	
 	@Id
-	@Column(name = "student_id")
-	private long id;
+	@Column(name = "s_id")
+	private String id;
 	
 	@Column(name = "name")
 	private String name;
 	
-	@Column(name = "s_id")
-	private String sId;
+	@Column(name = "usn")
+	private String usn;
 	
 	@Column(name = "email")
 	private String email;
 	
 	@Column(name = "phone")
-	private long phone;
+	private BigInteger phone;
 	
 	@Column(name = "password")
 	private String password;
 	
 	
+	
+	
+	
+	
 
-	@ManyToMany(targetEntity = StudentSubjectEntity.class, cascade = CascadeType.ALL)
+	
+	// adding mappedBy attribute here makes this entity as parent
+	@ManyToMany(fetch = FetchType.EAGER,  cascade = CascadeType.ALL)	
+	
+	//Associations marked as mappedBy must not define database mappings like @JoinTable or @JoinColumn
+	// therefore we will send @jointable to subject entity
 	@JoinTable(
-	        name = "students_and_subjects",
+	        name = "students_to_subjects",		
 	        joinColumns = {
-	            @JoinColumn(name = "student_id")
+	            @JoinColumn(name = "s_id")    
 	        },
 	        inverseJoinColumns = {
-	            @JoinColumn(name = "subject_id")
+	            @JoinColumn(name = "ss_id")	
 	        }
 	    )
-	 @JsonBackReference
-	 private List< StudentSubjectEntity > subjectList = new ArrayList<StudentSubjectEntity>();
+	 private List< StudentSubjectEntity > subjectList = new ArrayList<StudentSubjectEntity>();			// a student will have many subjects therefore a list
+	
+	
+	
+	
 	
 	
 	
@@ -80,35 +96,35 @@ public class StudentEntity {
 		
 	}
 	
-	
-	
-	
-
-	
 
 
-	public StudentEntity(long id, String name, String sId, String email, long phone, String password,
+
+	public StudentEntity(String id, String name, String usn, String email, BigInteger phone, String password,
 			List<StudentSubjectEntity> subjectList) {
+		super();
 		this.id = id;
 		this.name = name;
-		this.sId = sId;
+		this.usn = usn;
 		this.email = email;
 		this.phone = phone;
 		this.password = password;
 		this.subjectList = subjectList;
 	}
-	
 
 
-	public long getId() {
+
+
+	public String getId() {
 		return id;
 	}
 
 
 
-	public void setId(long id) {
+
+	public void setId(String id) {
 		this.id = id;
 	}
+
 
 
 
@@ -116,7 +132,8 @@ public class StudentEntity {
 		return name;
 	}
 
-	
+
+
 
 	public void setName(String name) {
 		this.name = name;
@@ -124,15 +141,18 @@ public class StudentEntity {
 
 
 
-	public String getsId() {
-		return sId;
+
+	public String getUsn() {
+		return usn;
 	}
 
-	
-	
-	public void setsId(String sId) {
-		this.sId = sId;
+
+
+
+	public void setUsn(String usn) {
+		this.usn = usn;
 	}
+
 
 
 
@@ -142,21 +162,25 @@ public class StudentEntity {
 
 
 
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
 
 
-	public long getPhone() {
+
+	public BigInteger getPhone() {
 		return phone;
 	}
 
 
 
-	public void setPhone(long phone) {
+
+	public void setPhone(BigInteger phone) {
 		this.phone = phone;
 	}
+
 
 
 
@@ -187,6 +211,7 @@ public class StudentEntity {
 
 
 
+
 	public void addSubject(StudentSubjectEntity subject) {
 		this.subjectList.add(subject);
 	}
@@ -201,13 +226,9 @@ public class StudentEntity {
 
 
 
-
-
-
-
 	@Override
 	public String toString() {
-		return "StudentEntity [id=" + id + ", name=" + name + ", sId=" + sId + ", email=" + email + ", phone=" + phone
+		return "StudentEntity [id=" + id + ", name=" + name + ", usn=" + usn + ", email=" + email + ", phone=" + phone
 				+ ", password=" + password + ", subjectList=" + subjectList + "]";
 	}
 
@@ -215,6 +236,7 @@ public class StudentEntity {
 
 
 
+	
 	
 	
 	

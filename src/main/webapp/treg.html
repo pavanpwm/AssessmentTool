@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Registration</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<br><br><br>
+
+
+<div id="teacherRegistrationForm" class="container" >
+<a href="/sreg.html" class="btn btn-info pull-right">Student Registration</a>
+<br>
+<h4 for="register">Teacher Registration:</h4>
+<br>
+	<div class="form-group" >
+      <label for="name">Name:</label>
+      <input type="text"  class="form-control" id="name" placeholder="Enter name" name="name" value="pavan" >
+    </div>
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="text"  class="form-control" id="email" placeholder="Enter email" name="email" value="pavan">
+    </div>
+    <div class="form-group">
+      <label for="phone">Phone:</label>
+      <input type="number"  class="form-control" id="phone" placeholder="Enter phone" name="phone" value="1111111">
+    </div>
+    <label for="subject">Subjects:</label>
+    <div id="subjects" class="form-group">
+      <input type="text"  class="form-control"  placeholder="Enter subject name" name="subjects[]"><br>
+    </div>
+    <button onclick="appendSubjects();" class="btn btn-warning pull-right"> + add</button>
+	<br><br>
+    <button onclick="submitForm()" class="btn btn-success">Submit</button> or <a href="/login" class="btn btn-info">login</a>
+</div>
+<br>
+<pre>
+<p> 
+for admin login : 
+username = admin
+password = b7oxSDWaUo
+
+Login as admin 
+you will see emails and passwords of all users
+copy  an email and password of a teacher
+log out of admin by clicking logout button
+login again with the teacher email and password you copied
+it will take you to dashboard
+explore it!!
+</p>
+</pre>
+
+
+
+
+
+
+
+
+
+<script>
+
+var subjectCount = 1;
+
+function appendSubjects(){
+subjectCount++;
+var d = document.createElement('div'); // is a node
+d.setAttribute("id", subjectCount);
+d.setAttribute("style", "display:inline-block;margin-right:3px;");
+d.innerHTML = 
+	  '<input type="text" style="display: inline-block" class="form-control" placeholder="Enter subject name" name="subjects[]">'
+	+ '<button style="display:inline-block;height:20px;font-size:10px"  id="a' + subjectCount +'" class=" btn-danger" onclick="detachS(event)"> X </button><br>';
+document.getElementById("subjects").appendChild(d);
+};
+
+
+function detachS(event){
+document.getElementById(event.target.id).parentElement.remove();
+}
+
+
+
+function submitForm(){
+
+	var tempArray = document.getElementsByName("subjects[]");
+	
+	console.log(tempArray);
+    var subjectsList = []
+    for (var f of tempArray) {
+     if( f != "" || f != null){
+     	subjectsList.push( { 'name' : f.value } );
+      }
+    }
+    
+    console.log(subjectsList);
+    
+    var formData = {
+		    "name": document.getElementById("name").value,
+		    "email": document.getElementById("email").value,
+		    "phone": document.getElementById("phone").value,
+		    "subjectList": subjectsList 
+            }
+    
+	console.log(formData);
+			
+			$.ajax({
+				async: false,
+				type: "POST",
+				contentType : "application/json",
+				dataType: "json",
+				data: JSON.stringify(formData),
+				url: "/teacher/register",
+				success: function(s) {
+					
+                    alert(s.message);
+					console.log(s);					
+				}
+			});
+
+
+
+
+}
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+

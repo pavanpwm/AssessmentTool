@@ -4,15 +4,16 @@ package org.tool.student;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.Subject;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.tool.mail.service.MailService;
+import org.tool.auth.User;
+import org.tool.auth.UserRepository;
 import org.tool.reponse.ResponseMessage;
 import org.tool.teacher.TeacherSubjectEntity;
 import org.tool.teacher.TeacherSubjectRepository;
@@ -33,39 +34,72 @@ public class StudentController {
 	private StudentRepository studRepo;
 	
 	@Autowired
-	private StudentSubjectRepository subRepo;
+	private StudentSubjectRepository studSubRepo;
 	
 	@Autowired
 	private TeacherSubjectRepository teachSubRepo;
 	
 	@Autowired
-	private ResponseMessage resp;
+	private UserRepository userRepo;
 	
+	@Autowired
+	private ResponseMessage responseMessage;
 	
 
-
-	
-	
-	@GetMapping("/list/student")
-	public List<StudentEntity> getAllStudenEntities() {
-		
-		List<StudentEntity> s = new ArrayList<StudentEntity>();
-		studRepo.findAll().forEach(s::add);
-		
-		return s;
-	}
 	
 	
 	
-	@GetMapping("/list/student/subjects")
+	
+	
+	
+	
+	// this method will show you how to tackle infinite references
+	@GetMapping("/student/subject/list")
+	@PreAuthorize("hasRole('ROLE_STUDENT')")
 	public List<StudentSubjectEntity> getAllStudenSubjectEntities() {
+				
+		List<StudentSubjectEntity> subjectList = new ArrayList<StudentSubjectEntity>();
+		studSubRepo.findAll().forEach(subjectList::add);
 		
-		List<StudentSubjectEntity> s = new ArrayList<StudentSubjectEntity>();
-		subRepo.findAll().forEach(s::add);
+		for (int i = 0; i < subjectList.size(); i++) {
+						
+			for (int j = 0; j < subjectList.get(i).getStudentsList().size(); j++) {
+				
+				//clear subject list from each subject list property of student entity
+				subjectList.get(i).getStudentsList().get(j).getSubjectList().clear();
+				
+				//unnecessary fields will be emptied or nulified
+				subjectList.get(i).getStudentsList().get(j).setEmail(null);
+				subjectList.get(i).getStudentsList().get(j).setPhone(null);  // phone is BigInteger and not primitive so null is valid
+			}
+		}
 		
-		return s;
+		return subjectList;
 	}
 	
+	/*
+	 
+    Example output from above method
+
+	 {
+        "id": "11112318966",
+        "name": "11",
+        "studentsList": [
+            {
+                "id": "112628481",
+                "name": "s1",
+                "usn": "s1"
+            },
+            {
+                "id": "112645260",
+                "name": "s2",
+                "usn": "s2"
+            }
+        ]
+    }
+
+
+	 */
 	
 	
 	
@@ -75,67 +109,68 @@ public class StudentController {
 	
 	
 	
-	
-	@PostMapping("/register/student")
+	@PostMapping("/student/register")
 	public ResponseMessage registerStudent(@RequestBody StudentEntity student ) {
 		
 		
+		//check if student email already exists in student table
 		if(! studRepo.existsStudentEntityByEmail(student.getEmail())) {
 			
-			student.setId(Integer.parseInt(java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", "")));
-			student.setPassword(RandomStringUtils.random(10, true, true));
+
+			//generate and set id
+			student.setId(java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
 			
-			
-			List<StudentSubjectEntity>  tempList = new ArrayList<StudentSubjectEntity>();
-			tempList.addAll(student.getSubjectList());
-			student.getSubjectList().clear();
-			
-			
+			//generate and set password
+			student.setPassword( RandomStringUtils.random(10, true, true) );
 			
 			
 			
+			//now check if subjects entered by student exist in db and update the subject list accordingly
 			
-			for (int i = 0; i < tempList.size(); i++) {
+			here :{
 				
-				TeacherSubjectEntity teacherSubject = new TeacherSubjectEntity();
-				StudentSubjectEntity studentSubject = new StudentSubjectEntity();
+				int subjectListSize = student.getSubjectList().size();
 				
-				if (  teachSubRepo.existsTeacherSubjectEntityById( tempList.get(i).getId()) ) {
+				for (int i = 0; i < subjectListSize ; i++) {
 					
-					teacherSubject = teachSubRepo.findTeacherSubjectEntityById( tempList.get(i).getId() );
+					TeacherSubjectEntity teacherSubject = new TeacherSubjectEntity();
 					
-					studentSubject.setName( teacherSubject.getName() );
-					studentSubject.setId( tempList.get(i).getId() );
-					
-					student.getSubjectList().add(studentSubject);
+					if ( teachSubRepo.existsTeacherSubjectEntityById( student.getSubjectList().get(i).getId()) ) {
+						
+						teacherSubject = teachSubRepo.findTeacherSubjectEntityById( student.getSubjectList().get(i).getId() );
+						student.getSubjectList().get(i).setName( teacherSubject.getName() );
+						
+						student.getSubjectList().get(i).getStudentsList().add(student);
+											
+					}else {
+						
+						student.getSubjectList().remove(i);						
+						break here;
+						
+					}
 				}
+				
 			}
 			
-			
-			
-			
-			
-			
-			
-			
-			for (int i = 0; i < student.getSubjectList().size(); i++) {
-				student.getSubjectList().get(i).getStudentsList().add(student);
-			}
-			
-			
+			// saving student auth credentials in user table.
+			User user = new User( student.getEmail(),  new BCryptPasswordEncoder(11).encode( student.getPassword()) , "ROLE_STUDENT" , true, true, true, true);
+			userRepo.save(user);
+
+			//save student data to student table
 			studRepo.save(student);
 
 			//MailService.send(student.getEmail(), "Registration Successful ", " Your user_id : " + student.getEmail() +  "  password : " + student.getPassword());
 									
-			resp.setStatus("success");
-			resp.setMessage("Your User ID and Password are sent to your mail. Please use them to login and change password for successful registration.");
-			return  resp;
+			responseMessage.setStatus("success");
+			responseMessage.setMessage("Your User ID and Password are sent to your mail. Please use them to login and change password for successful registration.");
+			return  responseMessage;
 			
 		}else {
 			
-			resp.setStatus("failure");
-			resp.setMessage("User already registered. Please register with a different email or click forgot password button to reset your password.");
-			return resp;
+			// if email already exists in db
+			responseMessage.setStatus("failure");
+			responseMessage.setMessage("User already registered. Please register with a different email or click forgot password button to reset your password.");
+			return responseMessage;
 		}
 	
 		

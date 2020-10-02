@@ -8,18 +8,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Entity
-@Table(name = "teacher_subjects")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
+@Table(name = "t_subjects")
+@JsonInclude(Include.NON_EMPTY)  
 public class TeacherSubjectEntity {
 	
 	@Id
-	@Column(name = "id")
+	@Column(name = "ts_id")
 	private String id;
 	
 	@Column(name = "name")
@@ -27,8 +26,9 @@ public class TeacherSubjectEntity {
 
 	
 	@ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "teacher_id")
-    private TeacherEntity teacher_id;
+    @JoinColumn(name = "t_id")				// the   " id " here is teacher_id and not subject_id
+	@JsonBackReference
+    private TeacherEntity teacher;			// a subject can have only a single teacher, therefore not a collection
 	
 	
 
@@ -43,41 +43,55 @@ public class TeacherSubjectEntity {
 		this.name = name;
 	}
 
-	public TeacherSubjectEntity(String id, String name, TeacherEntity teacher_id) {
+
+	public TeacherSubjectEntity(String id, String name, TeacherEntity teacher) {
+		super();
 		this.id = id;
 		this.name = name;
-		this.teacher_id = teacher_id;
+		this.teacher = teacher;
 	}
+
 
 	public String getId() {
 		return id;
 	}
 
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 
 	public String getName() {
 		return name;
 	}
 
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
+
 	public TeacherEntity getTeacher() {
-		return teacher_id;
+		return teacher;
 	}
 
-	public void setTeacher(TeacherEntity teacher_id) {
-		this.teacher_id = teacher_id;
+
+	public void setTeacher(TeacherEntity teacher) {
+		this.teacher = teacher;
 	}
 
 
 	@Override
 	public String toString() {
-		return "SubjectEntity [id=" + id + ", name=" + name + ", teacher_id=" + teacher_id + "]";
+		return "TeacherSubjectEntity [id=" + id + ", name=" + name + ", teacher=" + teacher + "]";
 	}
+	
+	
+	
+	
+
+	
 	
 	
 	

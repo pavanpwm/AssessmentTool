@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<title>Assesment Tool</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+
+
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+
+.footer {
+  position: fixed;
+  height: 50px;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: grey;
+  color: white;
+  text-align: center;
+}
+
+
+.tableCenter {
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<body class="w3-light-grey">
+
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
+  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+  <span class="w3-bar-item w3-right">Assessment Tool</span>
+</div>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+  <div class="w3-container w3-row">
+    <div class="w3-col s4">
+      <img src="https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/137409052/original/d472c30361632da1c8d8fa780f572807d78abd9f/cartoon-profile-picture-or-avatar.png" class="w3-circle w3-margin-right" style="width:46px">
+    </div>
+    <div class="w3-col s8 w3-bar">
+      Welcome, <strong><p id = "usernamehere"></p><p id = "useridhere"></p></strong>
+    </div>
+  </div>
+  <hr>
+  <div class="w3-container">
+    <h5>Dashboard</h5>
+  </div>
+  <div class="w3-bar-block">
+    <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+    <a href="http://localhost:8080/dashboard.html" id="Home" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-user fa-fw"></i>  Home</a>
+    <a id = "Subjects" onclick="getSubjectList(event)"  class="w3-bar-item w3-button w3-padding"><i class="fa fa-book fa-fw"></i>  Subjects</a>
+    <a id = "Tests" onclick="getTests(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-edit fa-fw"></i>  Tests</a>
+    <a id = "Profile" onclick="getProfileDetails(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-user-circle fa-fw"></i>  Profile</a>
+    <a id = "Security" onclick="getSecurityDetails(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-key fa-fw"></i>  Security</a>
+    <a id = "Notifications" onclick="getNotifications(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bell fa-fw"></i>  Notifications</a>
+    <a href="http://localhost:8080/logout" class="w3-bar-item w3-button w3-padding"><i class="fas fa-sign-out-alt"></i>  Logout</a>
+  </div>
+</nav>
+
+
+
+
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:22px">
+    <b><h5 id="headerhere">Home</b></h5>
+    <br>
+  </header>
+
+
+
+
+
+
+
+
+  
+  <div id="tableDiv"  class="tableCenter">
+				<!-- Div element to display tables -->
+				<div id="resultArray" class="table-responsive" >
+				</div>
+  </div>
+
+<div id="appendhere"  class="tableCenter w3-row-padding w3-margin-bottom w3-responsive">
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  <br>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Made with love. © 2020</p>
+  </footer>
+
+  <!-- End page content -->
+</div>
+
+<script>
+
+
+
+
+
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+
+
+
+
+window.onload = getSubjects();
+
+
+
+var subjectList = [];
+var studentList = [];
+var setUsername = document.getElementById("usernamehere").innerHTML;
+var setUserId = document.getElementById("useridhere").innerHTML;
+var setHeader = document.getElementById("headerhere").innerHTML;
+var contentPlace = document.getElementById("appendhere");
+var tableDiv = document.getElementById("tableDiv");
+var menu = [ "Home", "Subjects", "Tests", "Profile", "Security", "Notifications"];
+
+
+
+function getSubjects(){
+
+      
+	
+		
+      $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/teacher/subject/list",
+        success: function(s) {
+
+          document.getElementById("useridhere").innerHTML = s.id;
+          document.getElementById("usernamehere").innerHTML = s.name;
+          subjectList = s.subjectList;
+          displaySubjects();
+
+          console.log(s);
+
+        }
+      });
+
+  }
+
+
+
+function displaySubjects(){
+
+	
+	contentPlace.innerHTML = "";
+	tableDiv.innerHTML = "";
+	
+	  for (var i = 0; i < subjectList.length; i++) {
+
+	  
+		
+	  contentPlace.innerHTML += ' <div  class="w3-quarter w3-hover-sepia"  onclick="getStudents(' + "'"  + subjectList[i].id + "'" + ')"> ' +
+	                      '  <div class="w3-container w3-padding-16"  style="margin-top: 16px;background-color: lightblue;"> ' +
+	                      ' <div class="w3-left"></i></div> ' +
+	                      '  <i class="fa fa-book" ></i>  ' +
+	                      '  <h4> ' + subjectList[i].name + '</h4> ' + 
+	                      ' </div></div> ';
+
+	  }
+	  
+	  w3-close();
+
+
+
+	}
+
+
+
+
+
+function getStudents(id){
+
+	
+	contentPlace.innerHTML = "";
+	tableDiv.innerHTML = "";
+	
+	document.getElementById("headerhere").innerHTML = "Students List For Subject_Id : " + id ;			
+	console.log(id);
+	
+			$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: "/teacher/subject/" +  id +   "/student/list",
+				success: function(s) {
+					
+					console.log(s);
+          			studentList = s.studentsList;
+          			initTable();
+					
+
+				}
+			});
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+function initTable(){
+
+    var resultArray = studentList;
+		var noOfResult = resultArray.length;
+
+		if(noOfResult > 0) {
+
+			// CREATE DYNAMIC TABLE.
+			var table = document.createElement("table");
+			table.className = "w3-table-all w3-card-4 w3-hoverable ";
+			table.setAttribute('id', 'myTable');
+			table.style.width = '100%';
+			table.setAttribute('border', '1');
+			table.setAttribute('cellspacing', '0');
+			table.setAttribute('cellpadding', '5');
+
+			// retrieve column header
+
+			var col = []; // define an empty array
+			for (var i = 0; i < noOfResult; i++) {
+				for (var key in resultArray[i]) {
+					if (col.indexOf(key) === -1) {
+						col.push(key);
+					}
+				}
+			}
+
+
+
+			// CREATE TABLE HEAD .
+			var tHead = document.createElement("thead");
+
+
+
+			// CREATE ROW FOR TABLE HEAD .
+			var hRow = document.createElement("tr");
+
+
+			// ADD COLUMN HEADER TO ROW OF TABLE HEAD.
+			for (var i = 0; i < col.length; i++) {
+				    var dynamicSize = 300*(i+1);
+				    document.getElementById("tableDiv").style.maxWidth = dynamicSize + "px" ;
+					var th = document.createElement("th");
+					th.innerHTML = col[i] + "<i class='fa fa-sort' style='font-size:12px'></i>";
+					var x = i+1;
+					th.setAttribute("onclick", "w3.sortHTML('#myTable', '.item', 'td:nth-child(" + x + ")')");
+					th.setAttribute("style", "cursor:pointer");
+					hRow.appendChild(th);
+			}
+			tHead.appendChild(hRow);
+			table.appendChild(tHead);
+
+
+
+
+			// CREATE TABLE BODY .
+			var tBody = document.createElement("tbody");
+
+			// ADD COLUMN HEADER TO ROW OF TABLE HEAD.
+			for (var i = 0; i < noOfResult; i++) {
+
+					var bRow = document.createElement("tr"); // CREATE ROW FOR EACH RECORD .
+					bRow.setAttribute("class","item");
+
+
+					for (var j = 0; j < col.length; j++) {
+						var td = document.createElement("td");
+						td.innerHTML = resultArray[i][col[j]];
+						bRow.appendChild(td);
+					}
+					tBody.appendChild(bRow)
+
+			}
+			table.appendChild(tBody);
+
+
+			// FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+			var divContainer = document.getElementById("tableDiv");
+			divContainer.innerHTML = "";
+			divContainer.appendChild(table);
+
+		}
+
+    w3_close();
+
+	}
+
+
+
+
+
+
+function getTests(event){
+
+  document.getElementById("headerhere").innerHTML = "Your Tests";
+  changeMenuItemColor(event.target.id);
+  w3_close();
+
+}
+
+
+
+
+function getSubjectList(event){
+	
+	contentPlace.innerHTML = "";
+	tableDiv.innerHTML = "";
+	
+	document.getElementById("headerhere").innerHTML = "Your Subjects";
+	changeMenuItemColor(event.target.id);
+	getSubjects();
+	w3_close();
+}
+
+function getProfileDetails(event){
+
+	
+	contentPlace.innerHTML = "";
+	tableDiv.innerHTML = "";
+	
+  document.getElementById("headerhere").innerHTML = "Your Profile";
+  changeMenuItemColor(event.target.id);
+  w3_close();
+
+}
+
+function getSecurityDetails(event){
+
+	
+	contentPlace.innerHTML = "";
+	tableDiv.innerHTML = "";
+	
+  document.getElementById("headerhere").innerHTML = "Security Settings";
+  changeMenuItemColor(event.target.id);
+  w3_close();
+
+}
+
+
+function getNotifications(event){
+
+	contentPlace.innerHTML = "";
+	tableDiv.innerHTML = "";
+	
+  document.getElementById("headerhere").innerHTML = "Notifications";
+  changeMenuItemColor(event.target.id);
+  w3_close();
+
+
+}
+
+
+
+function changeMenuItemColor(id){
+  for (var i = 0; i < menu.length; i++) {
+    if (id == menu[i]) {
+      document.getElementById(id).className = "w3-bar-item w3-button w3-padding w3-blue";
+    }else{
+      document.getElementById(menu[i]).className = "w3-bar-item w3-button w3-padding";
+    }
+  }
+}
+
+
+
+
+
+
+
+  function getRandomColor() {
+                  var letters = 'BCDEF'.split('');
+                  var color = '#';
+                  for (var i = 0; i < 6; i++ ) {
+                      color += letters[Math.floor(Math.random() * letters.length)];
+                  }
+                  return color;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -6,33 +6,35 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Entity
-@Table(name = "student_subjects")
-
+@Table(name = "s_subjects")
+@JsonInclude(Include.NON_EMPTY)
 public class StudentSubjectEntity {
 	
+	
+	
 	@Id
-	@Column(name = "subject_id")
+	@Column(name = "ss_id")
 	private String id;
+	
+	
 	
 	@Column(name = "name")
 	private String name;
 	
 	
-	@ManyToMany(mappedBy = "subjectList", targetEntity = StudentEntity.class, cascade =  CascadeType.ALL )
-	@JsonManagedReference
-    private List<StudentEntity> studentsList = new ArrayList<StudentEntity>();
+	
+	
+	@ManyToMany(mappedBy = "subjectList" , fetch = FetchType.EAGER, cascade = CascadeType.ALL ) 
+    private List<StudentEntity> studentsList = new ArrayList<StudentEntity>();		//  a subject will have many students
 
 	
 	

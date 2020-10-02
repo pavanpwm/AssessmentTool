@@ -13,6 +13,8 @@ public interface TeacherRepository extends CrudRepository<TeacherEntity, Integer
 	
 	boolean existsTeacherEntityByEmail(String email);
 	
+	TeacherEntity findTeacherEntityByEmail(String email);
+	
 	
 
 }

@@ -54,8 +54,7 @@ public class TeacherDashboardController {
 	
 	
 	
-	
-	
+
 	
 	@GetMapping("/redirect")
 	public RedirectView redirect(HttpServletRequest request) {

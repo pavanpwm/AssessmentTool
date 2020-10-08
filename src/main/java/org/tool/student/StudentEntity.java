@@ -44,7 +44,7 @@ public class StudentEntity {
 
 	
 	@Id
-	@Column(name = "s_id")
+	@Column(name = "s_id" )
 	private String id;
 	
 	@Column(name = "name")
@@ -70,7 +70,7 @@ public class StudentEntity {
 
 	
 	// adding mappedBy attribute here makes this entity as parent
-	@ManyToMany(fetch = FetchType.EAGER,  cascade = CascadeType.ALL)	
+	@ManyToMany(fetch = FetchType.EAGER,  cascade = CascadeType.ALL)
 	
 	//Associations marked as mappedBy must not define database mappings like @JoinTable or @JoinColumn
 	// therefore we will send @jointable to subject entity

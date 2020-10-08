@@ -1,6 +1,5 @@
 package org.tool.teacher;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,7 +24,7 @@ public class TeacherSubjectEntity {
 	private String name;
 
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
     @JoinColumn(name = "t_id")				// the   " id " here is teacher_id and not subject_id
 	@JsonBackReference
     private TeacherEntity teacher;			// a subject can have only a single teacher, therefore not a collection

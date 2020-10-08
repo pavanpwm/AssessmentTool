@@ -107,7 +107,6 @@ var tableDiv = document.getElementById("tableDiv");
 
 function getTeachers(){
 
-		
 			$.ajax({
 				type: "GET",
 				dataType: "json",
@@ -119,6 +118,9 @@ function getTeachers(){
           			initTable();
           			getStudents();
 
+				},
+				error: function(error){
+					cosole.log(error);
 				}
 			});
 	}

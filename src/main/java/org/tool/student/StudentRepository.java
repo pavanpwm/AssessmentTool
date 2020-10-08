@@ -14,6 +14,11 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Integer
 	
 	boolean existsStudentEntityByEmail(String email);
 	
+	StudentEntity findById(String id);
+	
+	StudentEntity findByEmail(String email);
+	
+	
 	
 	
 

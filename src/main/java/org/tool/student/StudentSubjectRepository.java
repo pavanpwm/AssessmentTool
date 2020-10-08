@@ -17,8 +17,5 @@ public interface StudentSubjectRepository extends CrudRepository<StudentSubjectE
 	
 	StudentSubjectEntity findStudentSubjectEntityById(String id);
 	
-	
-	
-	
 
 }

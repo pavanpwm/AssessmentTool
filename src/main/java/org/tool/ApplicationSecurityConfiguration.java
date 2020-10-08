@@ -70,30 +70,24 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
 		http
 				.csrf().disable()
 				.authorizeRequests()
-				.antMatchers("/treg.html", "/sreg.html", "/student/register", "/teacher/register" , "/all/teacher/subject/list").permitAll()
+				.antMatchers("/treg.html", "/sreg.html", "/check/login", "/student/register", "/teacher/register" , "/all/teacher/subject/list").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				
 				//.httpBasic();
 				
 				.formLogin()
+				.loginPage("/login.html").permitAll()
+				.loginProcessingUrl("/login")
 				.defaultSuccessUrl("/redirect", true)
-		        
+				 //.failureUrl("/login.html?error=true")
 				
 				
-				/*
-				.formLogin()
-				.loginPage("/index.html").permitAll()
-				.loginProcessingUrl("/perform_login")
-		         .defaultSuccessUrl("/teacher/list", true)
-		         //.failureUrl("/index.html?error=true")
-		          * 
-		          */
 				.and()
 				.logout().invalidateHttpSession(true)
 				.clearAuthentication(true)
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-				.logoutSuccessUrl("/login").permitAll();
+				.logoutSuccessUrl("/login.html").permitAll();
 
 				
 			

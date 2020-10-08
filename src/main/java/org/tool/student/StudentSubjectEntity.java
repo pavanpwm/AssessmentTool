@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -33,7 +32,7 @@ public class StudentSubjectEntity {
 	
 	
 	
-	@ManyToMany(mappedBy = "subjectList" , fetch = FetchType.EAGER, cascade = CascadeType.ALL ) 
+	@ManyToMany(mappedBy = "subjectList",  cascade = CascadeType.ALL) 
     private List<StudentEntity> studentsList = new ArrayList<StudentEntity>();		//  a subject will have many students
 
 	

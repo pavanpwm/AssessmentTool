@@ -16,5 +16,6 @@ public interface TeacherRepository extends CrudRepository<TeacherEntity, Integer
 	TeacherEntity findTeacherEntityByEmail(String email);
 	
 	
+	
 
 }

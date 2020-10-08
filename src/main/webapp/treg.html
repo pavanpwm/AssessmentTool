@@ -35,7 +35,7 @@
     </div>
     <button onclick="appendSubjects();" class="btn btn-warning pull-right"> + add</button>
 	<br><br>
-    <button onclick="submitForm()" class="btn btn-success">Submit</button> or <a href="/login" class="btn btn-info">login</a>
+    <button onclick="submitForm()" class="btn btn-success">Submit</button> or <a href="/login.html" class="btn btn-info">Login</a>
 </div>
 <br>
 <pre>
@@ -103,21 +103,24 @@ function submitForm(){
 		    "email": document.getElementById("email").value,
 		    "phone": document.getElementById("phone").value,
 		    "subjectList": subjectsList 
-            }
+            };
     
-	console.log(formData);
+			console.log(formData);
 			
 			$.ajax({
 				async: false,
 				type: "POST",
-				contentType : "application/json",
-				dataType: "json",
+				contentType : "application/json",    
+				dataType: "json",					
 				data: JSON.stringify(formData),
 				url: "/teacher/register",
 				success: function(s) {
 					
-                    alert(s.message);
-					console.log(s);					
+                    alert(s.status);
+					console.log(s);			
+				},
+				error: function(){
+					alert("error");
 				}
 			});
 

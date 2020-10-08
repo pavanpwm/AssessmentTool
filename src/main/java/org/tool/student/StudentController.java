@@ -1,14 +1,9 @@
 package org.tool.student;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,29 +48,7 @@ public class StudentController {
 	
 	
 	
-	// this method will show you how to tackle infinite references
-	@GetMapping("/student/subject/list")
-	@PreAuthorize("hasRole('ROLE_STUDENT')")
-	public List<StudentSubjectEntity> getAllStudenSubjectEntities() {
-				
-		List<StudentSubjectEntity> subjectList = new ArrayList<StudentSubjectEntity>();
-		studSubRepo.findAll().forEach(subjectList::add);
-		
-		for (int i = 0; i < subjectList.size(); i++) {
-						
-			for (int j = 0; j < subjectList.get(i).getStudentsList().size(); j++) {
-				
-				//clear subject list from each subject list property of student entity
-				subjectList.get(i).getStudentsList().get(j).getSubjectList().clear();
-				
-				//unnecessary fields will be emptied or nulified
-				subjectList.get(i).getStudentsList().get(j).setEmail(null);
-				subjectList.get(i).getStudentsList().get(j).setPhone(null);  // phone is BigInteger and not primitive so null is valid
-			}
-		}
-		
-		return subjectList;
-	}
+	
 	
 	/*
 	 
@@ -133,7 +106,7 @@ public class StudentController {
 				
 				for (int i = 0; i < subjectListSize ; i++) {
 					
-					TeacherSubjectEntity teacherSubject = new TeacherSubjectEntity();
+					TeacherSubjectEntity teacherSubject;
 					
 					if ( teachSubRepo.existsTeacherSubjectEntityById( student.getSubjectList().get(i).getId()) ) {
 						

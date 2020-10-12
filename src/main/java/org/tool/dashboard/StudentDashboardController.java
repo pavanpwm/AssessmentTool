@@ -26,6 +26,7 @@ import org.tool.test.TestEntity;
 import org.tool.test.TestRepository;
 
 @RestController
+@PreAuthorize("hasRole('ROLE_STUDENT')")
 public class StudentDashboardController {
 
 	@Autowired
@@ -55,11 +56,12 @@ public class StudentDashboardController {
 	@Autowired
 	private ResponseMessage responseMessageS;
 
+	private boolean loggedInStudentHasThisSubject;
+
 	
 	
 	
 	@GetMapping("/student/details")
-	@PreAuthorize("hasRole('ROLE_STUDENT')")
 	public StudentEntity getStudentDetails(Principal principal) {
 		
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
@@ -73,7 +75,6 @@ public class StudentDashboardController {
 	
 	// this method will show you how to tackle infinite references
 	@GetMapping("/student/subject/list")
-	@PreAuthorize("hasRole('ROLE_STUDENT')")
 	public List<StudentSubjectEntity> getAllStudenSubjectEntities(Principal principal) {
 
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
@@ -85,7 +86,6 @@ public class StudentDashboardController {
 	
 	
 	@PostMapping("/student/add/subject")
-	@PreAuthorize("hasRole('ROLE_STUDENT')")
 	public ResponseMessage addStudentSubject(@RequestBody StudentSubjectEntity studentSubject, Principal principal) {
 		
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
@@ -109,7 +109,6 @@ public class StudentDashboardController {
 	
 	
 	@DeleteMapping("/student/delete/subject/{subjectId}")
-	@PreAuthorize("hasRole('ROLE_STUDENT')")
 	public ResponseMessage  deleteStudentSubject(@PathVariable("subjectId") String subjectId , Principal principal) {
 		
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
@@ -124,6 +123,41 @@ public class StudentDashboardController {
 			}
 		}
 		return responseMessageS;
+	}
+	
+	
+	
+	
+	@GetMapping("/student/subject/{subjectcode}/student/list")
+	public StudentSubjectEntity getAllStudenSubjectEntities(@PathVariable("subjectcode") String id,
+			Principal principal) {
+
+		// first we need to check if the subject id matches with the current logged in user
+
+		studentRepoS.findByEmail(principal.getName()).getSubjectList().forEach(eachSubject -> {
+			if (eachSubject.getId().equalsIgnoreCase(id)) {
+				loggedInStudentHasThisSubject = true;
+			}
+		});
+
+		if (loggedInStudentHasThisSubject) {
+
+			// just to be safe
+			loggedInStudentHasThisSubject = false;
+			StudentSubjectEntity subject = studSubRepoS.findStudentSubjectEntityById(id);
+
+			for (int j = 0; j < subject.getStudentsList().size(); j++) {
+				// clear subject list from each subject list property of student entity to avoid infinite references
+				subject.getStudentsList().get(j).getSubjectList().clear();		//to tackle infinite references
+				// unnecessary fields will be emptied or nullified so that JsonIgnore can ignore them in results.
+				subject.getStudentsList().get(j).setEmail(null);
+				subject.getStudentsList().get(j).setPassword(null);
+				subject.getStudentsList().get(j).setPhone(null); // phone is BigInteger and not primitive so null is valid
+			}
+			return subject;
+		} else {
+			return null;
+		}
 	}
 	
 	

@@ -2,24 +2,28 @@ package org.tool.auth;
 
 import java.security.Principal;
 
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 import org.tool.reponse.ResponseMessage;
 
 @RestController
+@PermitAll
 public class SecurityController {
 	
-	ResponseMessage respMessage;
+	@Autowired
+	private ResponseMessage respMessage;
 	
 	
 	
 	//if user is already logged in and goes to login page, then he is redirected his dashboard, else will remain on login page
 	@GetMapping("/check/login")
 	public ResponseMessage checkLogin(Principal principal) {
-		if(null == principal) {
+		if(principal == null) {
 			respMessage.setStatus("false");
 			return respMessage;
 		}
@@ -46,5 +50,6 @@ public class SecurityController {
 			return redirectView;
 		}
 	}
+	
 
 }

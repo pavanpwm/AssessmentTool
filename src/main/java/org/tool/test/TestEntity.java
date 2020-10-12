@@ -1,5 +1,9 @@
 package org.tool.test;
 
+import java.sql.Date;
+import java.sql.Time;
+
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -34,17 +38,20 @@ public class TestEntity {
 	@Column(name = "marks_fwaq")
 	private int marksFwap;			// marks for wrongly answered questions
 	
-	@Column(name = "total_marks")
+	@Column(name = "total_marks") 
 	private int totalMarks;
 	
+	@Basic
 	@Column(name = "start_date")
-	private String startDate;
+	private Date startDate;
 	
+	@Basic
 	@Column(name = "start_time")
-	private String startTime;
+	private Time startTime;
 	
+	@Basic
 	@Column(name = "end_time")
-	private String endTime;
+	private Time endTime;
 	
 	@Column(name = "test_status")
 	private String testStatus;
@@ -53,8 +60,8 @@ public class TestEntity {
 	}
 
 	public TestEntity(String testCode, String teacherUsername, String subjectCode, String collectionCode,
-			String testName, int totalQuestions, int marksFcaq, int marksFwap, int totalMarks, String startDate,
-			String startTime, String endTime, String testStatus) {
+			String testName, int totalQuestions, int marksFcaq, int marksFwap, int totalMarks, Date startDate,
+			Time startTime, Time endTime, String testStatus) {
 		super();
 		this.testCode = testCode;
 		this.teacherUsername = teacherUsername;
@@ -143,27 +150,27 @@ public class TestEntity {
 		this.totalMarks = totalMarks;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public String getStartTime() {
+	public Time getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(String startTime) {
+	public void setStartTime(Time startTime) {
 		this.startTime = startTime;
 	}
 
-	public String getEndTime() {
+	public Time getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(String endTime) {
+	public void setEndTime(Time endTime) {
 		this.endTime = endTime;
 	}
 
@@ -183,20 +190,7 @@ public class TestEntity {
 				+ totalMarks + ", startDate=" + startDate + ", startTime=" + startTime + ", endTime=" + endTime
 				+ ", testStatus=" + testStatus + "]";
 	}
-	
-	
-	
-	
 
 
 	
-	
-	
-
-	
-	
-	
-	
-	
-
 }

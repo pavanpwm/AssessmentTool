@@ -35,6 +35,7 @@ import org.tool.test.TestEntity;
 import org.tool.test.TestRepository;
 
 @RestController
+@PreAuthorize("hasRole('ROLE_TEACHER')")
 public class TeacherDashboardController {
 
 	@Autowired
@@ -74,7 +75,6 @@ public class TeacherDashboardController {
 	
 	
 	@GetMapping("/teacher/details")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public TeacherEntity getTeacherDetails(Principal principal) {
 		
 		TeacherEntity teacher = teacherRepo.findTeacherEntityByEmail(principal.getName());
@@ -88,7 +88,6 @@ public class TeacherDashboardController {
 	// to get subject list for the logged in teacher
 	//this method will send both teacher details and also subject list
 	@GetMapping("/teacher/subject/list")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public List<TeacherSubjectEntity> getAllTeacherSubjectEntities(Principal principal) {
 
 		TeacherEntity teacher = teacherRepo.findTeacherEntityByEmail(principal.getName());
@@ -104,7 +103,6 @@ public class TeacherDashboardController {
 	// to add a new subject
 	// append new subject name to url
 	@PutMapping("/teacher/add/subject/{subject}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage addSubject(@PathVariable("subject") String subject, Principal principal) {
 
 		TeacherSubjectEntity teacherSubject = new TeacherSubjectEntity();
@@ -124,7 +122,6 @@ public class TeacherDashboardController {
 	// to remove a subject
 	// append subject name to url
 	@DeleteMapping("/teacher/delete/subject/{subjectId}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage deleteSubject(@PathVariable("subjectId") String subjectId, Principal principal) {
 
 		teacherSubjectRepo.deleteById(subjectId);
@@ -138,7 +135,6 @@ public class TeacherDashboardController {
 	
 	
 	@GetMapping("/teacher/subject/{subjectcode}/student/list")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public StudentSubjectEntity getAllStudenSubjectEntities(@PathVariable("subjectcode") String id,
 			Principal principal) {
 
@@ -171,14 +167,12 @@ public class TeacherDashboardController {
 		} else {
 			return null;
 		}
-
 	}
 	
 	
 	
 	@Transactional
 	@DeleteMapping("/teacher/delete/{subjectId}/{studentId}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage removeStudentFromSubject(@PathVariable("studentId") String studentId,
 			@PathVariable("subjectId") String subjectId, Principal principal) {
 		
@@ -191,7 +185,6 @@ public class TeacherDashboardController {
 
 	
 	@GetMapping("/teacher/collection/list")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public List<CollectionEntity> getCollection(Principal principal){
 		
 		return collectionRepo.findByTeacherUsername(principal.getName());
@@ -220,7 +213,6 @@ public class TeacherDashboardController {
 	
 	@Transactional
 	@DeleteMapping("/teacher/delete/collection/{collectionCode}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage deleteCollection(@PathVariable("collectionCode") String collectionCode, Principal principal) {
 		
 		collectionRepo.deleteByCollectionCodeAndTeacherUsername(collectionCode, principal.getName());
@@ -232,7 +224,6 @@ public class TeacherDashboardController {
 
 	
 	@GetMapping("/teacher/{collection}/question/list")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public List<QuestionEntity> getAllQuestions(@PathVariable("collection") String collection, Principal principal){
 		
 		return questionRepo.findByTeacherUsernameAndCollectionCode(principal.getName(), collection);
@@ -241,7 +232,6 @@ public class TeacherDashboardController {
 	
 	
 	@PostMapping("/teacher/add/question")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage addQuestion(@RequestBody QuestionEntity question , Principal principal) {
 		
 		question.setTeacherUsername(principal.getName());
@@ -253,7 +243,6 @@ public class TeacherDashboardController {
 
 	
 	@PutMapping("/teacher/update/question/{questionId}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage updateQuestion(@RequestBody QuestionEntity question, @PathVariable("questionId") int questionId, Principal principal) {
 		
 		QuestionEntity q = questionRepo.findByTeacherUsernameAndQuestionId(principal.getName(), questionId);
@@ -274,53 +263,26 @@ public class TeacherDashboardController {
 	
 	@Transactional
 	@DeleteMapping("/teacher/delete/question/{questionId}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage deleteQuestion(@PathVariable("questionId") int questionId, Principal principal) {
 		
 		questionRepo.deleteByTeacherUsernameAndQuestionId(principal.getName(), questionId);
-		
 		responseMessage.setStatus("deleted");
 		return responseMessage;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	
 	@GetMapping("/teacher/test/list")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public List<TestEntity> getAllTests(Principal principal){
 		return	testRepo.findByTeacherUsername(principal.getName());
 	}
 	
-	
+
 	
 	
 	@PostMapping("/teacher/add/test")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage addTest(@RequestBody TestEntity test, Principal principal) {
 		
 		test.setTestCode(test.getTestName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
@@ -328,13 +290,12 @@ public class TeacherDashboardController {
 		test.setTestStatus("pending");
 		testRepo.save(test);
 		
-		responseMessage.setStatus("created");
+		responseMessage.setMessage("test created");
 		return responseMessage;
 	}
 	
 	
 	@PutMapping("/teacher/update/test")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage updateTest(@RequestBody TestEntity test, Principal principal) {
 		
 		TestEntity t = testRepo.findByTestCode(test.getTestCode());
@@ -352,28 +313,63 @@ public class TeacherDashboardController {
 		}else {
 			responseMessage.setStatus("cannot make changes to completed tests");
 		}
-		
 		return responseMessage;
 	} 
 	
 	
+	
 	@DeleteMapping("/teacher/delete/test/{testCode}")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage deleteTest(@PathVariable("testCode") String testCode, Principal principal) {
 		
 		TestEntity t = testRepo.findByTestCode(testCode);
 		if(t.getTeacherUsername().equalsIgnoreCase(principal.getName()) && t.getTestStatus().equalsIgnoreCase("pending") ) {
 			
 			testRepo.delete(t);
-			responseMessage.setStatus("test deleted");
+			responseMessage.setMessage("test deleted");
 			
 		}else {
-			responseMessage.setStatus("cannot make changes to completed tests");
+			responseMessage.setMessage("cannot make changes to completed tests");
 		}
 		
 		return responseMessage;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -401,7 +397,6 @@ public class TeacherDashboardController {
 	
 
 	@PutMapping("/teacher/update/profile")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage updateTeacherProfile(@RequestBody TeacherEntity teacher, Principal principal,
 			HttpServletRequest request) {
 
@@ -439,7 +434,6 @@ public class TeacherDashboardController {
 	}
 
 	@PutMapping("/teacher/update/password")
-	@PreAuthorize("hasRole('ROLE_TEACHER')")
 	public ResponseMessage updateTeacherPassword(@RequestBody TeacherEntity teacher, Principal principal,
 			HttpServletRequest request) {
 
@@ -476,57 +470,5 @@ public class TeacherDashboardController {
 		}
 
 	}
-
-
-	
-
-	
-
-	/*
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * // this method will show you how to tackle infinite references
-	 * 
-	 * @GetMapping("/student/subject/list")
-	 * 
-	 * @PreAuthorize("hasRole('ROLE_ADMIN')") public List<StudentSubjectEntity>
-	 * getAllStudenSubjectEntities(@PathVariable String id) {
-	 * 
-	 * 
-	 * List<StudentSubjectEntity> subjectList = new
-	 * ArrayList<StudentSubjectEntity>();
-	 * studSubRepo.findAll().forEach(subjectList::add);
-	 * 
-	 * for (int i = 0; i < subjectList.size(); i++) {
-	 * 
-	 * for (int j = 0; j < subjectList.get(i).getStudentsList().size(); j++) {
-	 * 
-	 * // clear subject list from each subject list property of student entity
-	 * subjectList.get(i).getStudentsList().get(j).getSubjectList().clear();
-	 * 
-	 * // unnecessary fields will be emptied or nulified
-	 * subjectList.get(i).getStudentsList().get(j).setEmail(null);
-	 * subjectList.get(i).getStudentsList().get(j).setPhone(null); // phone is
-	 * BigInteger and not primitive so null is valid
-	 * 
-	 * } }
-	 * 
-	 * return subjectList;
-	 * 
-	 * 
-	 * 
-	 * }
-	 *
-	 *
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
 
 }

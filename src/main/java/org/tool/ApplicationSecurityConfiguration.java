@@ -70,7 +70,7 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
 		http
 				.csrf().disable()
 				.authorizeRequests()
-				.antMatchers("/treg.html", "/sreg.html", "/check/login", "/student/register", "/teacher/register" , "/all/teacher/subject/list").permitAll()
+				.antMatchers("/treg.html", "/sreg.html", "/homepage.html", "/check/login", "/student/register", "/teacher/register" , "/all/teacher/subject/list", "/generate/**", "/verify/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				
@@ -80,7 +80,7 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
 				.loginPage("/login.html").permitAll()
 				.loginProcessingUrl("/login")
 				.defaultSuccessUrl("/redirect", true)
-				 //.failureUrl("/login.html?error=true")
+				.failureUrl("/login.html?error=true")
 				
 				
 				.and()

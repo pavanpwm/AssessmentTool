@@ -11,26 +11,42 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="https://www.w3schools.com/lib/w3.js"></script>
 
+  <link rel="shortcut icon" type="image/x-icon" href="https://cdn5.vectorstock.com/i/1000x1000/78/49/wheat-oats-logo-vector-22577849.jpg" />
+
 
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 .footer {
   position: fixed;
-  height: 50px;
-  left: 0;
-  bottom: 0;
+  height: 30px;
+  color:white;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  margin-bottom: 0px;
   width: 100%;
   background-color: grey;
   color: white;
   text-align: center;
 }
 
+body {
+    margin-bottom:50px;
+}
+
+
 
 .tableCenter {
   margin-left: auto;
   margin-right: auto;
 }
+
+
+.shadowBox {
+  box-shadow: 0px 25px 30px rgba(0, 0, 0, 0.3);
+}
+
 </style>
 <body class="w3-light-grey">
 
@@ -60,9 +76,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     <a id = "collections" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-th fa-fw"></i>   Question Collection</a> 
     <a id = "tests" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-edit fa-fw"></i>  Tests</a>
     <a id = "profile" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-user-circle fa-fw"></i>  Profile</a>
-    <a id = "security" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-key fa-fw"></i>  Security</a>
-    <a id = "notifications" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bell fa-fw"></i>  Notifications</a>
-    <a href="http://localhost:8080/logout" class="w3-bar-item w3-button w3-padding"><i class="fas fa-sign-out-alt"></i>  Logout</a>
+    <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-sign-out"></i>   Logout  </a>
   </div>
 </nav>
 
@@ -73,8 +87,10 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <!-- Overlay effect when opening sidebar on small screens -->
 <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
+
+
 <!-- !PAGE CONTENT! -->
-<div class="w3-main" style="margin-left:300px;margin-top:43px;ma">
+<div  class="w3-main" style="margin-left:300px;margin-top:43px;ma">
 
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
@@ -89,7 +105,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <div id="hidden"  hidden></div><br>
 <div id="staticContent"  style="margin:10px"></div><br>
 <div id="appendhere"  class="tableCenter w3-row-padding w3-margin-bottom w3-responsive"></div>
-
+<datalist id="subjectCodes"></datalist>
 
 
 <div class="container">
@@ -111,7 +127,77 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 
 
-
+<div class="container">
+		<!-- Modal -->
+		<div class="modal fade" id="createTestModal" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">New Test</h4> </div>
+					<div class="modal-body">
+						<div>
+							<div class="form-group">
+								<label for="testName">Test name:</label>
+								<input type="text" class="form-control" id="testName" placeholder="Enter test name" name="testName">
+              </div>
+              <div class="form-group">
+                  <label for="collectionCode">Select collection code:</label>
+                  <select class="form-control" id="collectionCode" onclick="fillSubjectCode();">
+                  </select>
+              </div>
+              <div class="form-group">
+                  <label for="subjectCode">Subject code:</label>
+                  <input type="text" class="form-control" id="subjectCode" name="subjectCode" disabled>
+              </div>
+              <div class="form-group">
+								<label for="totalQuestions">Total number of questions:</label>
+								<input type="number" class="form-control" id="totalQuestions" onclick="setMaxQuestion()" placeholder="Enter total number of questions" name="totalQuestions">
+              </div>
+              <div class="form-group">
+                  <label for="marksFcaq">Marks for correct answers:</label>
+                  <input type="number" list="m1" class="form-control" id="marksFcaq" value="1" name="marksFcaq">
+                  <datalist id="m1">
+                  <option value="1">
+                  <option value="2">
+                  <option value="3">
+                  <option value="4">
+                  </datalist>
+              </div>
+              <div class="form-group">
+                  <label for="marksFwap">Marks for wrong answers:</label>
+                  <input type="number" list="m2" class="form-control" id="marksFwap" value="0" name="marksFwap">
+                  <datalist id="m2">
+                  <option value="0">
+                  <option value="-1">
+                  <option value="-2">
+                  <option value="-3">
+                  </datalist>
+              </div>
+              <div class="form-group">
+								<label for="totalMarks">Total marks:</label>
+								<input type="number" class="form-control" id="totalMarks" onclick="setTotalMarks()" placeholder="Total marks" name="totalMarks">
+              </div>
+              <div class="form-group">
+								<label for="startDate">Start date:</label>
+								<input type="date" class="form-control" id="startDate" oninput="validateDate()"  name="startDate">
+              </div>
+              <div class="form-group">
+								<label for="startTime">Start time:</label>
+								<input type="time" class="form-control" id="startTime" oninput="validateStatTime()" name="startTime">
+              </div>
+              <div class="form-group">
+								<label for="endTime">End time:</label>
+								<input type="time" class="form-control" id="endTime" oninput="validateEndTime()" name="endTime">
+              </div>
+							<button  class="btn btn-success" onclick="addTest()">Submit</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 
@@ -119,15 +205,17 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <br>
 
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>Made with love. © 2020</p>
-  </footer>
 
   <!-- End page content -->
 </div>
-
+  <!-- Footer -->
+  <footer class="footer">
+      <div class="container">
+        <span class="text-muted" style="color:white">Made with love. © 2020</span>
+      </div>
+  </footer>
 <script>
+
 
 
 
@@ -173,7 +261,7 @@ var setHeader = document.getElementById("headerhere").innerHTML;
 var staticContent = document.getElementById("staticContent");
 var contentPlace = document.getElementById("appendhere");
 var tableDiv = document.getElementById("tableDiv");
-var menu = ["subjects", "collections", "tests", "profile", "security", "notifications"];
+var menu = ["subjects", "collections", "tests", "profile"];
 
 
 
@@ -188,7 +276,6 @@ function getTeacherDetails(){
         url: "/teacher/details",
         success: function(s) {
 
-          document.getElementById("useridhere").innerHTML = s.id;
           document.getElementById("usernamehere").innerHTML = s.name;
           displaySubjects();
           console.log(s);
@@ -249,9 +336,12 @@ function getSubjects(){
           subjectList = s;
           displaySubjects();
           console.log(s);
+          
 
         }
       });
+      
+      
       
       document.getElementById("staticContent").innerHTML =
     	  '<div class="form-inline" style="margin-left:5px;"> '+
@@ -288,13 +378,18 @@ function displaySubjects(){
 	contentPlace.innerHTML = "";	
 	for (var i = 0; i < subjectList.length; i++) {
 
-	  contentPlace.innerHTML += ' <div  class="w3-quarter w3-hover-sepia"  > ' +
+	  contentPlace.innerHTML += 
+		  				  ' <div  class="w3-quarter w3-hover-sepia "  > ' +
 	                      '  <div class="w3-container w3-padding-16"  style="margin-top: 16px;background-color: lightblue;"> ' +
 	                      ' <div class="w3-right"><i class="fa fa-trash" style="color:red" onclick="deleteSubject(' + "'" + subjectList[i].id  + "'" + ')" ></i></div> ' +
 	                      '  <i class="fa fa-book" ></i>  ' +
 	                      '  <h4 onclick="getStudents(' + "'"  + subjectList[i].id + "'" + ')"> ' + subjectList[i].name + '</h4> ' + 
 	                      ' </div></div> ';
 
+	  }
+	
+     for (var i = 0; i < subjectList.length; i++) {
+    	document.getElementById("subjectCodes").innerHTML = '<option value="' +  subjectList[i].id  + '">' 
 	  }
 	  
 	  w3-close();
@@ -340,7 +435,7 @@ function initTable(id){
     
     for (var i = 0; i < resultArray.length; i++) {
 
-    	resultArray[i].Remove = '<button onclick="removeStudent(' + "'" + id + "','" +  resultArray[i].id + "'" + ')">Remove</button>';
+    	resultArray[i].Remove = '<button class="btn btn-danger btn-sm" style="margin:5px" onclick="removeStudent(' + "'" + id + "','" +  resultArray[i].id + "'" + ')">Remove</button>';
     	
 	}
     
@@ -525,7 +620,7 @@ function getCollections(){
 	    	  '<div class="form-inline" style="margin-left:5px;"> '+
 	    	  '<div class="form-group">'+
 	    	  '<label for="subjectCode" style="margin-left:5px;" >Subject Code:</label>'+
-	    	  '<input type="text" class="form-control" id="subjectCode" style="margin-left:10px;" >'+
+	    	  '<input type="text" list="subjectCodes" class="form-control" id="subjectCode" style="margin-left:10px;" >'+
 	    	  '</div>'+
 	    	  '<div class="form-group">'+
 	    	  '<label for="newCollection" style="margin-left:5px;" >Collection Name:</label>'+
@@ -536,9 +631,8 @@ function getCollections(){
 	      
 	    	  
 	      contentPlace.innerHTML = "";
-	      
 	    	  
-	    	  w3-close();
+	      w3-close();
 	    	  
 }
 
@@ -591,8 +685,6 @@ function deleteCollection(collectionCode){
 	
 	
 }
-
-
 
 
 
@@ -679,7 +771,7 @@ function getQuestions(collectionCode){
 					
 					contentPlace.innerHTML = str;
 				}
-			});
+		});
 	}
 
 
@@ -779,13 +871,269 @@ function saveQuestion(){
 		          
 		        }
 		      });
-		
-	
-	 
-	 
-	
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//teacher Test interface....................................................................................................................
+
+var tests = [];
+
+function getTests(){
+	
+	console.log("got into test");
+	
+	staticContent.innerHTML = 
+		'<button type="button" class="btn btn-info" data-toggle="modal" onclick="showTestForm();" data-target="#createTestModal">Create Test</button>';
+	
+		$.ajax({
+	        type: "GET",
+	        dataType: "json",
+	        url: "/teacher/test/list",
+	        success: function(s) {
+	          tests = s;
+	          contentPlace.innerHTML = "";	
+	          
+	  			var str = "";
+				str =
+					'<div class="container"><div class="panel-group" id="accordion">';
+				    
+				for (var i = 0; i < s.length; i++) {
+					str += 
+						'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
+				        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '"><strong> '+ i + ' :- </strong> ' + s[i].testName + '</a><i id="'+  s[i].testCode  +'" class="fa fa-trash pull-right" onclick="deleteTest(event)" style="color:red"></i></h4></div>' +
+				        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
+				        
+					str +=
+						'<p>Collection Code : ' + s[i].collectionCode    + '</p>'+
+						'<p>Subject Code : ' + s[i].subjectCode    + '</p>'+
+						'<p>Total number of Question : ' + s[i].totalQuestions    + '</p>'+
+						'<p>Marks for correct answers : ' + s[i].marksFcaq    + '</p>'+
+						'<p>Marks for wrong answers : ' + s[i].marksFwap    + '</p>'+
+						'<p>Total marks : ' + s[i].totalMarks    + '</p>'+
+						'<p>Start date : ' + s[i].startDate    + '</p>'+
+						'<p>Satrt Time : ' + s[i].startTime    + '</p>'+
+						'<p>End Time : ' + s[i].endTime    + '</p>'+
+						'<p>Test Status : ' + s[i].testStatus    + '</p>'+
+						'</div></div>';
+				}
+				str += '</div></div>';
+				
+				contentPlace.innerHTML = str;
+
+	          console.log(s);
+
+	        }
+	      });
+	      
+		  w3-close();
+
+}
+
+
+
+
+
+
+
+var collectionListForTestForm = [];
+
+
+function showTestForm(){
+
+$.ajax({
+	        type: "GET",
+	        dataType: "json",
+	        url: "/teacher/collection/list",
+	        success: function(s) {
+            collectionListForTestForm = s;
+            	for(var i=0; i< s.length ; i++){
+           		 document.getElementById("collectionCode").innerHTML +=
+              			'<option value="'+  s[i].collectionCode +'">'+  s[i].collectionCode +'</option>';
+            	}
+	     	}
+});
+
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth()+1; //January is 0!
+var yyyy = today.getFullYear();
+ if(dd<10){
+        dd='0'+dd
+    } 
+    if(mm<10){
+        mm='0'+mm
+    } 
+
+today = yyyy+'-'+mm+'-'+dd;
+document.getElementById("startDate").setAttribute("min", today);
+
+}
+
+
+function fillSubjectCode(){
+if(document.getElementById("collectionCode").value==""){
+  alert("Please select collection code!!");
+  document.getElementById("collectionCode").focus();
+}else{
+  for(var i=0; i< collectionListForTestForm.length ; i++){
+    if(document.getElementById("collectionCode").value == collectionListForTestForm[i].collectionCode){
+      document.getElementById("subjectCode").value = collectionListForTestForm[i].subjectCode;
+      document.getElementById("subjectCode").placeholder = collectionListForTestForm[i].subjectCode;
+    }
+  }
+}
+}
+
+function setMaxQuestion(){
+if(document.getElementById("collectionCode").value==""){
+  alert("Please select collection code!!");
+  document.getElementById("collectionCode").focus();
+}else{
+  $.ajax({
+				type: "GET",
+				dataType: "json",
+				url: "/teacher/" + document.getElementById("collectionCode").value + "/question/list",
+				success: function(s) {
+         			 document.getElementById("totalQuestions").setAttribute('max', s.length);
+         			 document.getElementById("totalQuestions").setAttribute('value', s.length);
+				}
+	});
+}
+
+}
+
+
+function setTotalMarks(){
+	if(document.getElementById("totalQuestions").value==0){
+		  alert("Please enter total number of questions!!");
+		  document.getElementById("totalQuestions").focus();
+	}else if(document.getElementById("marksFcaq").value==0){
+		  alert("Please enter marks for selecting correct answer!!");
+		  document.getElementById("marksFcaq").focus();
+	}else{
+		document.getElementById("totalMarks").value = document.getElementById("totalQuestions").value * document.getElementById("marksFcaq").value;
+	}
+}
+
+
+
+
+function validateDate(){
+	
+	
+}
+
+function validateStatTime(){
+	
+	
+	
+}
+
+function validateEndTime(){
+	
+	
+	
+}
+
+
+function addTest(){
+	
+	var testInfo = {
+			
+				"testName":document.getElementById("testName").value,
+				"collectionCode":document.getElementById("collectionCode").value,
+				"subjectCode":document.getElementById("subjectCode").value,
+				"totalQuestions":document.getElementById("totalQuestions").value,
+				"marksFcaq":document.getElementById("marksFcaq").value,
+				"marksFwap":document.getElementById("marksFwap").value,
+				"totalMarks":document.getElementById("totalMarks").value,
+				"startDate":document.getElementById("startDate").value,
+				"startTime":document.getElementById("startTime").value + ":00",
+				"endTime":document.getElementById("endTime").value + ":00",
+				"testStatus": "pending"				
+				
+		};
+		
+		
+		$.ajax({
+	        type: "POST",
+	        contentType: "application/json",
+	        data: JSON.stringify(testInfo),
+	        dataType: "json",
+	        url: "/teacher/add/test",
+	        success: function(s) {
+	        	console.log(s);
+		         $('#createTestModal').modal('hide');
+	         	 alert(s.message);
+	         	 getTests();   
+
+	        }
+	    });
+
+}
+
+
+
+function deleteTest(event){
+	
+	 $.ajax({
+	        type: "DELETE",
+	        dataType: "json",
+	        url: "/teacher/delete/test/" + event.target.id,
+	        success: function(s) {
+	        	 console.log(s);
+		         $('#myModal').modal('hide');
+		         getTests();   
+	         	 alert(s.message);
+	          
+	        }
+	      });
+	
+}
+
+
 
 
 
@@ -837,6 +1185,8 @@ function saveQuestion(){
 function setMeBlue(event){
 	
 	
+	contentPlace.innerHTML = "";
+	staticContent.innerHTML = "";
 	switch (event.target.id) {
 	  case "subjects":
 		getSubjects();
@@ -844,8 +1194,11 @@ function setMeBlue(event){
 	  case "collections":
 		getCollections();
 	    break;
+	  case "tests":
+		getTests();
+		break;
 	}
-	  contentPlace.innerHTML = "";
+
 	  changeMenuItemColor(event.target.id);
 	  w3_close();
 }
@@ -875,9 +1228,6 @@ function changeMenuItemColor(id){
                   }
                   return color;
   }
-
-
-
 
 
 

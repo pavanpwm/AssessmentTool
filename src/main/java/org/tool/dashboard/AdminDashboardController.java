@@ -14,7 +14,9 @@ import org.tool.teacher.TeacherRepository;
 import org.tool.teacher.TeacherSubjectEntity;
 import org.tool.teacher.TeacherSubjectRepository;
 
+
 @RestController
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AdminDashboardController {
 	
 	@Autowired
@@ -32,7 +34,6 @@ public class AdminDashboardController {
 	
 
 		@GetMapping("/teacher/list")
-		@PreAuthorize("hasRole('ROLE_ADMIN')")
 		public List<TeacherEntity> getAllTeacherEntities() {
 			List<TeacherEntity> allTeachers = new ArrayList<TeacherEntity>();
 
@@ -46,7 +47,6 @@ public class AdminDashboardController {
 
 		// this method will show you how to tackle infinite references
 		@GetMapping("/student/list")
-		@PreAuthorize("hasRole('ROLE_ADMIN')")
 		public List<StudentEntity> getAllStudenEntities() {
 
 			List<StudentEntity> studentList = new ArrayList<StudentEntity>();

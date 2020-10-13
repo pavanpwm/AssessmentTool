@@ -15,7 +15,6 @@
 
 
 <style>
-html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 .footer {
   position: fixed;
@@ -102,8 +101,8 @@ body {
 
 
 
-<div id="hidden"  hidden></div><br>
-<div id="staticContent"  style="margin:10px"></div><br>
+<div id="hidden"  hidden></div>
+<div id="staticContent"  style="margin:10px"></div>
 <div id="appendhere"  class="tableCenter w3-row-padding w3-margin-bottom w3-responsive"></div>
 <datalist id="subjectCodes"></datalist>
 
@@ -347,7 +346,7 @@ function getSubjects(){
     	  '<div class="form-inline" style="margin-left:5px;"> '+
     	  '<div class="form-group">'+
     	  '<label for="newSubject" style="margin-left:5px;" >Subject Name:</label>'+
-    	  '<input type="text" class="form-control" id="newSubject" style="margin-left:10px;" >'+
+    	  '<input type="text" onkeypress="alphaNumOnly(event)" onpaste="return false;" class="form-control" id="newSubject" style="margin-right:10px" >'+
     	  '</div>'+
     	  '<button onclick="addSubject()" class="btn btn-default" style="margin-left:10px;" ><i class="fa fa-plus" ></i> Add</button></div>';
 
@@ -362,7 +361,6 @@ function addSubject(){
         dataType: "json",
         url: "/teacher/add/subject/" + document.getElementById("newSubject").value,
         success: function(s) {
-          alert(s.message);
           console.log(s);
           getSubjects();
         }
@@ -386,10 +384,8 @@ function displaySubjects(){
 	                      '  <h4 onclick="getStudents(' + "'"  + subjectList[i].id + "'" + ')"> ' + subjectList[i].name + '</h4> ' + 
 	                      ' </div></div> ';
 
-	  }
-	
-     for (var i = 0; i < subjectList.length; i++) {
-    	document.getElementById("subjectCodes").innerHTML = '<option value="' +  subjectList[i].id  + '">' 
+	            
+	  document.getElementById("subjectCodes").innerHTML  += '<option value="' +  subjectList[i].id  + '">' 
 	  }
 	  
 	  w3-close();
@@ -405,6 +401,7 @@ function getStudents(id){
 
 	
 	document.getElementById("headerhere").innerHTML = "Students List For Subject_Id : " + id ;
+	document.getElementById("staticContent").innerHTML = "";
 	console.log(id);
 	
 			$.ajax({
@@ -527,32 +524,39 @@ function initTable(id){
 	
 function deleteSubject(id){
 	
-	$.ajax({
-		type: "DELETE",
-		dataType: "json",
-		url: "/teacher/delete/subject/" +  id,
-		success: function(s) {
-			alert(s.message);
-  			getSubjects();
+	var r = confirm("Are you sure?");
+	if ( r ) {
+		
+		$.ajax({
+			type: "DELETE",
+			dataType: "json",
+			url: "/teacher/delete/subject/" +  id,
+			success: function(s) {
+	  			getSubjects();
 
-		}
-	});
-	
+			}
+		});
+	  }
 }
 
 
 
 function removeStudent(subject, student){
 	
+	var r = confirm("Are you sure?");
+	
+  if (r) {
+	
 	$.ajax({
 		type: "DELETE",
 		dataType: "json",
 		url: "/teacher/delete/" + subject + "/" +  student,
 		success: function(s) {
-			alert(s.message);
 			getStudents(subject);
 		}
 	});
+	
+	}
 }
 
 
@@ -631,6 +635,8 @@ function getCollections(){
 	      
 	    	  
 	      contentPlace.innerHTML = "";
+	      
+	      
 	    	  
 	      w3-close();
 	    	  
@@ -656,7 +662,6 @@ function addCollection(){
         dataType: "json",
         url: "/teacher/add/collection",
         success: function(s) {
-          alert(s.message);
           console.log(s);
           getCollections();
         }
@@ -672,17 +677,21 @@ function addCollection(){
 
 function deleteCollection(collectionCode){
 	
+	var r = confirm("Are you sure?");
+
+	if ( r ) {
+	
 	$.ajax({
         type: "DELETE",
         dataType: "json",
         url: "/teacher/delete/collection/" + collectionCode,
         success: function(s) {
-          alert(s.message);
           console.log(s);
           getCollections();
         }
       });
 	
+	}
 	
 }
 
@@ -749,14 +758,14 @@ function getQuestions(collectionCode){
 					for (var i = 0; i < questionList.length; i++) {
 						str += 
 							'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
-					        '<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + questionList[i].questionId + '"><strong> '+ i + '. Question :</strong> ' + questionList[i].questionString + '</a><i class="fa fa-trash pull-right" onclick="deleteQuestion(' + questionList[i].questionId + ')" style="color:red"></i></h4></div>' +
+					        '<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + questionList[i].questionId + '"><strong>Question '+ i + ':  </strong> ' + questionList[i].questionString + '</a><i class="fa fa-trash pull-right" onclick="deleteQuestion(' + questionList[i].questionId + ')" style="color:red"></i></h4></div>' +
 					        '<div id="collapse' + questionList[i].questionId + '" class="panel-collapse collapse"><ul class="list-group">';
 													
 						choices = questionList[i].choices.split("_mjhzsgdf_");
 						for (var j = 0; j < choices.length; j++) {
 							if (choices[j] == questionList[i].answer ) {
 								str +=
-									'<li class="list-group-item" style="color:green"><strong>' + j + '.</strong> ' + choices[j] + '</li>';
+									'<li class="list-group-item" style="background-color:lightgreen"><strong>' + j + '.</strong> ' + choices[j] + '</li>';
 							}else{
 								str +=
 									'<li class="list-group-item"><strong>' + j + '.</strong> ' + choices[j] + '</li>';
@@ -778,6 +787,11 @@ function getQuestions(collectionCode){
 
 
 function deleteQuestion(questionId){
+	
+	
+	var r = confirm("Are you sure?");
+
+	if ( r ) {
 
 		 $.ajax({
 		        type: "DELETE",
@@ -787,11 +801,10 @@ function deleteQuestion(questionId){
 		        	 console.log(s);
 			         $('#myModal').modal('hide');
 			         getQuestions(document.getElementById("hidden").innerHTML);
-		         	 alert(s.message);
 		          
 		        }
 		      });
-	
+	}
 }
 
 
@@ -867,7 +880,6 @@ function saveQuestion(){
 		        	console.log(s);
 			         $('#myModal').modal('hide');
 			         getQuestions(questionData.collectionCode);
-		         	 alert(s.message);
 		          
 		        }
 		      });
@@ -942,11 +954,12 @@ function getTests(){
 				for (var i = 0; i < s.length; i++) {
 					str += 
 						'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
-				        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '"><strong> '+ i + ' :- </strong> ' + s[i].testName + '</a><i id="'+  s[i].testCode  +'" class="fa fa-trash pull-right" onclick="deleteTest(event)" style="color:red"></i></h4></div>' +
+				        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a><i id="'+  s[i].testCode  +'" class="fa fa-trash pull-right" onclick="deleteTest(event)" style="color:red"></i></h4></div>' +
 				        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
 				        
 					str +=
-						'<p>Collection Code : ' + s[i].collectionCode    + '</p>'+
+						
+						'<div style="padding:10px" ><p>Collection Code : ' + s[i].collectionCode    + '</p>'+
 						'<p>Subject Code : ' + s[i].subjectCode    + '</p>'+
 						'<p>Total number of Question : ' + s[i].totalQuestions    + '</p>'+
 						'<p>Marks for correct answers : ' + s[i].marksFcaq    + '</p>'+
@@ -955,7 +968,7 @@ function getTests(){
 						'<p>Start date : ' + s[i].startDate    + '</p>'+
 						'<p>Satrt Time : ' + s[i].startTime    + '</p>'+
 						'<p>End Time : ' + s[i].endTime    + '</p>'+
-						'<p>Test Status : ' + s[i].testStatus    + '</p>'+
+						'<p>Test Status : ' + s[i].testStatus    + '</p></div>'+
 						'</div></div>';
 				}
 				str += '</div></div>';
@@ -1106,7 +1119,6 @@ function addTest(){
 	        success: function(s) {
 	        	console.log(s);
 		         $('#createTestModal').modal('hide');
-	         	 alert(s.message);
 	         	 getTests();   
 
 	        }
@@ -1118,6 +1130,11 @@ function addTest(){
 
 function deleteTest(event){
 	
+	
+	var r = confirm("Are you sure?");
+
+	if ( r ) {
+	
 	 $.ajax({
 	        type: "DELETE",
 	        dataType: "json",
@@ -1125,12 +1142,10 @@ function deleteTest(event){
 	        success: function(s) {
 	        	 console.log(s);
 		         $('#myModal').modal('hide');
-		         getTests();   
-	         	 alert(s.message);
-	          
+		         getTests();   	          
 	        }
 	      });
-	
+	}
 }
 
 
@@ -1231,10 +1246,20 @@ function changeMenuItemColor(id){
 
 
 
+  function alphaNumOnly (e) {  // Accept only alpha numerics, no special characters 
+	    var regex = new RegExp("^[a-zA-Z0-9 ]+$");
+	    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+	    if (regex.test(str)) {
+	        return true;
+	    }
+
+	    e.preventDefault();
+	    return false;
+	}
 
 
 
-
+ 
 
 </script>
 

@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "students_to_subjects")
-public class StudentSubjectRalationEntity {
+public class StudentSubjectRelationEntity {
 	
 	
 	@Id
@@ -20,12 +20,12 @@ public class StudentSubjectRalationEntity {
 	
 	
 
-	public StudentSubjectRalationEntity() {
+	public StudentSubjectRelationEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StudentSubjectRalationEntity(String studentId, String subjectId) {
+	public StudentSubjectRelationEntity(String studentId, String subjectId) {
 		super();
 		this.studentId = studentId;
 		this.subjectId = subjectId;

@@ -1,7 +1,10 @@
 package org.tool.dashboard;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +21,7 @@ import org.tool.reponse.ResponseMessage;
 import org.tool.student.StudentEntity;
 import org.tool.student.StudentRepository;
 import org.tool.student.StudentSubjectEntity;
+import org.tool.student.StudentSubjectRelationEntityRepository;
 import org.tool.student.StudentSubjectRepository;
 import org.tool.teacher.TeacherRepository;
 import org.tool.teacher.TeacherSubjectEntity;
@@ -55,8 +59,13 @@ public class StudentDashboardController {
 
 	@Autowired
 	private ResponseMessage responseMessageS;
+	
+	@Autowired
+	private StudentSubjectRelationEntityRepository studSubRelRepoS;
 
 	private boolean loggedInStudentHasThisSubject;
+
+	
 
 	
 	
@@ -108,21 +117,15 @@ public class StudentDashboardController {
 	
 	
 	
-	@DeleteMapping("/student/delete/subject/{subjectId}")
-	public ResponseMessage  deleteStudentSubject(@PathVariable("subjectId") String subjectId , Principal principal) {
+	@Transactional
+	@DeleteMapping("/student/delete/{subjectId}/{studentId}")
+	public ResponseMessage removeStudentFromSubject(@PathVariable("studentId") String studentId,
+			@PathVariable("subjectId") String subjectId, Principal principal) {
 		
-		StudentEntity student = studentRepoS.findByEmail(principal.getName());
-		for (int i = 0; i < student.getSubjectList().size(); i++) {
-			if (student.getSubjectList().get(i).getId().equalsIgnoreCase(subjectId)) {
-				student.getSubjectList().remove(i);
-				studentRepoS.save(student);
-				responseMessageS.setStatus("deleted");
-				break;
-			}else {
-				responseMessageS.setStatus("failed");
-			}
-		}
+		studSubRelRepoS.removeByStudentIdAndSubjectId(subjectId, studentId);
+	    responseMessageS.setStatus("removed");
 		return responseMessageS;
+		
 	}
 	
 	
@@ -167,10 +170,17 @@ public class StudentDashboardController {
 	
 	
 	
-	@GetMapping("/student/subject/{subjectId}/tests")
-	@PreAuthorize("hasRole('ROLE_STUDENT')")
-	public List<TestEntity>  getStudentSubjectTests(@PathVariable("subjectId") String subjectId , Principal principal){
-		return testRepoS.findBySubjectCode(subjectId);
+	@GetMapping("/student/test/list")
+	public List<TestEntity>  getStudentSubjectTests(Principal principal){
+		
+		List<TestEntity> tests = new ArrayList<TestEntity>();
+		
+		studentRepoS.findByEmail(principal.getName()).getSubjectList().forEach(eachSubject -> {
+			tests.addAll( testRepoS.findBySubjectCode( eachSubject.getId() ) ); 
+				
+		});
+		
+		return tests;
 	}
 	
 	

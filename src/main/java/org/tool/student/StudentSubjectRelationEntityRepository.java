@@ -7,15 +7,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StudentSubjectRalationEntityRepository extends CrudRepository<StudentSubjectRalationEntity, String> {
+public interface StudentSubjectRelationEntityRepository extends CrudRepository<StudentSubjectRelationEntity, String> {
 	
 	
 	//@Query("delete from StudentSubjectRalationEntity s where s.studentId = ?1 and s.subjectId = ?2")
-	void deleteStudentSubjectRalationEntityByStudentIdAndSubjectId(String studentId, String subjectId);
+	//void deleteStudentSubjectRalationEntityByStudentIdAndSubjectId(String studentId, String subjectId);
 	
 	
 	@Modifying
-	@Query("delete from StudentSubjectRalationEntity f where f.subjectId=:subjectId and f.studentId=:studentId")
+	@Query("delete from StudentSubjectRelationEntity f where f.subjectId=:subjectId and f.studentId=:studentId")
 	void removeByStudentIdAndSubjectId(@Param("subjectId") String subjectId, @Param("studentId") String studentId);
 
 }

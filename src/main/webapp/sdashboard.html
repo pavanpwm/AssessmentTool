@@ -15,7 +15,7 @@
 
 
 <style>
-html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+
 
 .footer {
   position: fixed;
@@ -170,7 +170,7 @@ var menu = ["subjects", "tests", "profile"];
 
 
 
-// teacher details....................................................................................................................
+// student details....................................................................................................................
 
 function getStudentDetails(){
 	
@@ -224,7 +224,7 @@ function getStudentDetails(){
 
 
 
-//teacher subjects menu....................................................................................................................
+//student subjects menu....................................................................................................................
 
 
 
@@ -249,7 +249,7 @@ function getSubjects(){
     	  '<div class="form-inline" style="margin-left:5px;"> '+
     	  '<div class="form-group">'+
     	  '<label for="newSubject" style="margin-left:5px;" >Subject Name:</label>'+
-    	  '<input type="text" list="subjectCodes"  class="form-control" id="newSubject" style="margin-left:10px;" >'+
+    	  '<input type="text" list="subjectCodes"  class="form-control" id="newSubject" style="margin-right:10px;" >'+
     	  '</div>'+
     	  '<button onclick="addSubject()" class="btn btn-default" style="margin-left:10px;" ><i class="fa fa-plus" ></i> Add</button></div>';
 
@@ -321,10 +321,11 @@ function initTable(id){
 
 			// CREATE DYNAMIC TABLE.
 			var table = document.createElement("table");
-			table.className = "table";
+			table.className = "table table-striped table-hover table-condensed";
 			table.setAttribute('id', 'myTable');
 			table.style.width = '100%';
 			table.setAttribute('border', '1');
+			table.setAttribute('background-color', 'white');
 			table.setAttribute('cellspacing', '0');
 			table.setAttribute('cellpadding', '5');
 
@@ -425,7 +426,22 @@ function addSubject(){
 
 
 	
+function deleteSubject(id){
 	
+	var r = confirm("Are you sure?");
+	if ( r ) {
+		
+		$.ajax({
+			type: "DELETE",
+			dataType: "json",
+			url: "/student/delete/subject/" +  id,
+			success: function(s) {
+	  			getSubjects();
+
+			}
+		});
+	  }
+}
 	
 
 
@@ -472,7 +488,8 @@ function addSubject(){
 
 
 
-//teacher Test interface....................................................................................................................
+//student Test interface....................................................................................................................
+
 
 var tests = [];
 
@@ -480,10 +497,12 @@ function getTests(){
 	
 	console.log("got into test");
 	
+	staticContent.innerHTML = "";
+	
 		$.ajax({
 	        type: "GET",
 	        dataType: "json",
-	        url: "/teacher/test/list",
+	        url: "/student/test/list",
 	        success: function(s) {
 	          tests = s;
 	          contentPlace.innerHTML = "";	
@@ -495,11 +514,12 @@ function getTests(){
 				for (var i = 0; i < s.length; i++) {
 					str += 
 						'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
-				        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '"><strong> '+ i + ' :- </strong> ' + s[i].testName + '</a><i id="'+  s[i].testCode  +'" class="fa fa-trash pull-right" onclick="deleteTest(event)" style="color:red"></i></h4></div>' +
+				        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
 				        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
 				        
 					str +=
-						'<p>Collection Code : ' + s[i].collectionCode    + '</p>'+
+						
+						'<div style="padding:10px" ><p>Collection Code : ' + s[i].collectionCode    + '</p>'+
 						'<p>Subject Code : ' + s[i].subjectCode    + '</p>'+
 						'<p>Total number of Question : ' + s[i].totalQuestions    + '</p>'+
 						'<p>Marks for correct answers : ' + s[i].marksFcaq    + '</p>'+
@@ -508,7 +528,7 @@ function getTests(){
 						'<p>Start date : ' + s[i].startDate    + '</p>'+
 						'<p>Satrt Time : ' + s[i].startTime    + '</p>'+
 						'<p>End Time : ' + s[i].endTime    + '</p>'+
-						'<p>Test Status : ' + s[i].testStatus    + '</p>'+
+						'<p>Test Status : ' + s[i].testStatus    + '</p></div>'+
 						'</div></div>';
 				}
 				str += '</div></div>';
@@ -523,7 +543,6 @@ function getTests(){
 		  w3-close();
 
 }
-
 
 
 

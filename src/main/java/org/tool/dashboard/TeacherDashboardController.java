@@ -25,7 +25,7 @@ import org.tool.question.collection.QuestionRepository;
 import org.tool.reponse.ResponseMessage;
 import org.tool.student.StudentRepository;
 import org.tool.student.StudentSubjectEntity;
-import org.tool.student.StudentSubjectRalationEntityRepository;
+import org.tool.student.StudentSubjectRelationEntityRepository;
 import org.tool.student.StudentSubjectRepository;
 import org.tool.teacher.TeacherEntity;
 import org.tool.teacher.TeacherRepository;
@@ -63,7 +63,7 @@ public class TeacherDashboardController {
 	private TestRepository testRepo;
 	
 	@Autowired
-	private StudentSubjectRalationEntityRepository  studSubRelRepo;;
+	private StudentSubjectRelationEntityRepository  studSubRelRepo;;
 	
 	
 	@Autowired

@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage;
 public class MailService {
 	
 	final static String from = "service.assessment.tool@gmail.com";
-	final static String password = "iAmFucked@7448";
+	final static String password = "4anon@2020";
 
 	
 	

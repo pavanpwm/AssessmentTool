@@ -17,4 +17,6 @@ public interface TestRepository extends CrudRepository<TestEntity, String> {
 	
 	List<TestEntity> findBySubjectCode(String subjectCode);
 	
+	boolean existsByTestCodeAndSubjectCode(String testCode, String subjectCode);
+	
 }

@@ -10,6 +10,8 @@ public interface QuestionRepository extends CrudRepository<QuestionEntity, Integ
 	
 	List<QuestionEntity> findByTeacherUsernameAndCollectionCode(String teacherUsername, String collectionCode);
 	
+	QuestionEntity findByQuestionIdAndCollectionCode(int questionId, String collectionCode);
+	
 	QuestionEntity findByTeacherUsernameAndQuestionId(String teacherUsername, int questionId);
 	
 	void deleteByTeacherUsernameAndQuestionId(String teacherUsername, int questionId);

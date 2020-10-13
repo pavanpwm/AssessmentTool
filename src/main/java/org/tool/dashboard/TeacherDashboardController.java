@@ -1,6 +1,10 @@
 package org.tool.dashboard;
 
 import java.security.Principal;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,11 +69,9 @@ public class TeacherDashboardController {
 	@Autowired
 	private StudentSubjectRelationEntityRepository  studSubRelRepo;;
 	
-	
 	@Autowired
 	private ResponseMessage responseMessage;
 
-	boolean loggedInTeacherHasThisSubject = false;
 	
 	
 	
@@ -139,34 +141,26 @@ public class TeacherDashboardController {
 			Principal principal) {
 
 		// first we need to check if the subject id matches with the current logged in user
-
-		teacherRepo.findTeacherEntityByEmail(principal.getName()).getSubjectList().forEach(eachSubject -> {
-			if (eachSubject.getId().equalsIgnoreCase(id)) {
-				loggedInTeacherHasThisSubject = true;
-			}
-		});
-
-		if (loggedInTeacherHasThisSubject) {
-
-			// just to be safe
-			loggedInTeacherHasThisSubject = false;
-			StudentSubjectEntity subject = studSubRepo.findStudentSubjectEntityById(id);
-
-			for (int j = 0; j < subject.getStudentsList().size(); j++) {
-				// clear subject list from each subject list property of student entity to avoid infinite references
-				subject.getStudentsList().get(j).getSubjectList().clear();		//to tackle infinite references
-				// unnecessary fields will be emptied or nullified so that JsonIgnore can ignore them in results.
-				subject.getStudentsList().get(j).setEmail(null);
-				subject.getStudentsList().get(j).setPassword(null);
-				subject.getStudentsList().get(j).setPhone(null); // phone is BigInteger and not primitive so null is valid
+		
+		TeacherEntity teacher = teacherRepo.findTeacherEntityByEmail(principal.getName());
+		
+		for (int i = 0; i < teacher.getSubjectList().size(); i++) {
+			if (teacher.getSubjectList().get(i).getId().equalsIgnoreCase(id)) {
 				
+				StudentSubjectEntity subject = studSubRepo.findStudentSubjectEntityById(id);
+				for (int j = 0; j < subject.getStudentsList().size(); j++) {
+					// clear subject list from each subject list property of student entity to avoid infinite references
+					subject.getStudentsList().get(j).getSubjectList().clear();		//to tackle infinite references
+					// unnecessary fields will be emptied or nullified so that JsonIgnore can ignore them in results.
+					subject.getStudentsList().get(j).setEmail(null);
+					subject.getStudentsList().get(j).setPassword(null);
+					subject.getStudentsList().get(j).setPhone(null); // phone is BigInteger and not primitive so null is valid
+				}
+				return subject;
 			}
-
-			return subject;
-
-		} else {
-			return null;
 		}
+		
+		return null;
 	}
 	
 	
@@ -285,12 +279,32 @@ public class TeacherDashboardController {
 	@PostMapping("/teacher/add/test")
 	public ResponseMessage addTest(@RequestBody TestEntity test, Principal principal) {
 		
-		test.setTestCode(test.getTestName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
-		test.setTeacherUsername(principal.getName());
-		test.setTestStatus("pending");
-		testRepo.save(test);
+		int totalQuestionsavailable = questionRepo.findByTeacherUsernameAndCollectionCode(principal.getName(), test.getCollectionCode()).size();
+		if ( test.getStartDate().equals(Date.valueOf(LocalDate.now())) 
+				&& test.getStartTime().after(Time.valueOf(LocalTime.now())) 
+				&& test.getEndTime().after(test.getStartTime()) 
+				&& test.getTotalQuestions() <= totalQuestionsavailable ) {
+			
+			test.setTestCode(test.getTestName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
+			test.setTeacherUsername(principal.getName());
+			test.setTestStatus("pending");
+			testRepo.save(test);
+			
+			responseMessage.setMessage("test created");
+			
+		}else if ( test.getStartDate().after(Date.valueOf(LocalDate.now()))
+				&& test.getTotalQuestions() <= totalQuestionsavailable ) {
+			
+			test.setTestCode(test.getTestName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
+			test.setTeacherUsername(principal.getName());
+			test.setTestStatus("pending");
+			testRepo.save(test);
+			
+			responseMessage.setMessage("test created");
+		}else {
+			responseMessage.setMessage("Please enter valid date and time or number of questions");
+		}
 		
-		responseMessage.setMessage("test created");
 		return responseMessage;
 	}
 	

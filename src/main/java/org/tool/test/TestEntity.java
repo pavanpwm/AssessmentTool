@@ -55,13 +55,16 @@ public class TestEntity {
 	
 	@Column(name = "test_status")
 	private String testStatus;
+	
+	@Column(name = "results_generated")
+	private boolean resultsGenerated;
 
 	public TestEntity() {
 	}
 
 	public TestEntity(String testCode, String teacherUsername, String subjectCode, String collectionCode,
 			String testName, int totalQuestions, int marksFcaq, int marksFwap, int totalMarks, Date startDate,
-			Time startTime, Time endTime, String testStatus) {
+			Time startTime, Time endTime, String testStatus, boolean resultsGenerated) {
 		super();
 		this.testCode = testCode;
 		this.teacherUsername = teacherUsername;
@@ -76,6 +79,7 @@ public class TestEntity {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.testStatus = testStatus;
+		this.resultsGenerated = resultsGenerated;
 	}
 
 	public String getTestCode() {
@@ -182,14 +186,24 @@ public class TestEntity {
 		this.testStatus = testStatus;
 	}
 
+	public boolean isResultsGenerated() {
+		return resultsGenerated;
+	}
+
+	public void setResultsGenerated(boolean resultsGenerated) {
+		this.resultsGenerated = resultsGenerated;
+	}
+
 	@Override
 	public String toString() {
 		return "TestEntity [testCode=" + testCode + ", teacherUsername=" + teacherUsername + ", subjectCode="
 				+ subjectCode + ", collectionCode=" + collectionCode + ", testName=" + testName + ", totalQuestions="
 				+ totalQuestions + ", marksFcaq=" + marksFcaq + ", marksFwap=" + marksFwap + ", totalMarks="
 				+ totalMarks + ", startDate=" + startDate + ", startTime=" + startTime + ", endTime=" + endTime
-				+ ", testStatus=" + testStatus + "]";
+				+ ", testStatus=" + testStatus + ", resultsGenerated=" + resultsGenerated + "]";
 	}
+
+	
 
 
 	

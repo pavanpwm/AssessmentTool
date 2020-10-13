@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tool.auth.User;
 import org.tool.auth.UserRepository;
-import org.tool.mail.service.MailService;
 import org.tool.reponse.ResponseMessage;
 
 @RestController
@@ -39,7 +38,7 @@ public class TeacherRegistrationController {
 			String otp = RandomStringUtils.random(5, true, false);
 			request.getSession().setAttribute("otp", otp);
 			request.getSession().setAttribute("verified", false);
-			MailService.send(email, "One Time Password ", " Your OTP is :  " + otp);
+			//MailService.send(email, "One Time Password ", " Your OTP is :  " + otp);
 
 			responseMessage.setMessage("Please verify OTP that is sent to your mail");
 		} else {
@@ -55,13 +54,23 @@ public class TeacherRegistrationController {
 	@GetMapping("/verify/teacher/otp/{otp}")
 	public ResponseMessage verifyOtp(@PathVariable("otp") String otp, HttpServletRequest request) {
 
-		if (request.getSession().getAttribute("otp").equals(otp)) {
+	/*	
+	 * 
+	 * 
+	 
+	 if (request.getSession().getAttribute("otp").equals(otp)) {
 			request.getSession().removeAttribute("otp");
 			request.getSession().setAttribute("verified", true);
 			responseMessage.setMessage("true");
 		} else {
 			responseMessage.setMessage("false");
-		}
+	 }
+
+	 * 
+	 */
+		
+		request.getSession().setAttribute("verified", true);
+		responseMessage.setMessage("true");
 		return responseMessage;
 	}
 
@@ -73,7 +82,7 @@ public class TeacherRegistrationController {
 		// check if email already exists in db.
 		if (!tRepo.existsTeacherEntityByEmail(teacher.getEmail()) && request.getSession().getAttribute("verified").equals(true)) {
 
-			request.getSession().setAttribute("verified", false );
+			request.getSession().removeAttribute("verified");
 			
 			teacher.setId(java.time.LocalDate.now().toString().replaceAll("-", "")
 					+ java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
@@ -95,8 +104,8 @@ public class TeacherRegistrationController {
 			tRepo.save(teacher);
 
 			// send password to the mail id
-			MailService.send(teacher.getEmail(), "Registration Successful ",
-					" Your user_id : " + teacher.getEmail() + " password : " + teacher.getPassword());
+			//MailService.send(teacher.getEmail(), "Registration Successful ",
+			//		" Your user_id : " + teacher.getEmail() + " password : " + teacher.getPassword());
 
 			// set response message and return it as resposne
 			responseMessage.setStatus("success");

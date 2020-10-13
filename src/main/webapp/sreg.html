@@ -229,12 +229,12 @@
 
 <br>
 <br><br>
-<br>
-<div id="studentRegistrationForm" class="container" >
-<h4 for="register">Student Registration:</h4>
 <div id="spin"  style="text-align:center;font-size:24px" hidden>
 <i class="fa fa-circle-o-notch fa-spin" ></i>
 </div>
+<div id="studentRegistrationForm" class="container" >
+<h4 for="register">Student Registration:</h4>
+
 	<div class="form-group" >
       <label for="name">Name:</label>
       <input type="text"  class="form-control" id="name" placeholder="Enter name" name="name">
@@ -405,10 +405,12 @@ function submitForm(){
 					
 					document.getElementById("spin").style.display = "none";
 		            alert(s.message);
-					console.log(s);			
+					console.log(s);
+					location.reload();
 				},
 				error: function(){
 					document.getElementById("spin").style.display = "none";
+					location.reload();
 				}
 			});
 

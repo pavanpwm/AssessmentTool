@@ -1,7 +1,12 @@
 package org.tool.dashboard;
 
 import java.security.Principal;
+import java.sql.Date;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -12,10 +17,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tool.auth.UserRepository;
 import org.tool.question.collection.CollectionRepository;
+import org.tool.question.collection.QuestionEntity;
 import org.tool.question.collection.QuestionRepository;
 import org.tool.reponse.ResponseMessage;
 import org.tool.student.StudentEntity;
@@ -26,6 +33,8 @@ import org.tool.student.StudentSubjectRepository;
 import org.tool.teacher.TeacherRepository;
 import org.tool.teacher.TeacherSubjectEntity;
 import org.tool.teacher.TeacherSubjectRepository;
+import org.tool.test.AssessmentEntity;
+import org.tool.test.AssessmentRepository;
 import org.tool.test.TestEntity;
 import org.tool.test.TestRepository;
 
@@ -62,8 +71,9 @@ public class StudentDashboardController {
 	
 	@Autowired
 	private StudentSubjectRelationEntityRepository studSubRelRepoS;
-
-	private boolean loggedInStudentHasThisSubject;
+	
+	@Autowired
+	private AssessmentRepository assessmentRepoS;
 
 	
 
@@ -136,31 +146,26 @@ public class StudentDashboardController {
 			Principal principal) {
 
 		// first we need to check if the subject id matches with the current logged in user
-
-		studentRepoS.findByEmail(principal.getName()).getSubjectList().forEach(eachSubject -> {
-			if (eachSubject.getId().equalsIgnoreCase(id)) {
-				loggedInStudentHasThisSubject = true;
+		
+		StudentEntity student =   studentRepoS.findByEmail(principal.getName());
+		
+		for (int i = 0; i < student.getSubjectList().size(); i++) {
+			if (student.getSubjectList().get(i).getId().equalsIgnoreCase(id)) {
+				StudentSubjectEntity subject = studSubRepoS.findStudentSubjectEntityById(id);
+				for (int j = 0; j < subject.getStudentsList().size(); j++) {
+					// clear subject list from each subject list property of student entity to avoid infinite references
+					subject.getStudentsList().get(j).getSubjectList().clear();		//to tackle infinite references
+					// unnecessary fields will be emptied or nullified so that JsonIgnore can ignore them in results.
+					subject.getStudentsList().get(j).setEmail(null);
+					subject.getStudentsList().get(j).setPassword(null);
+					subject.getStudentsList().get(j).setPhone(null); // phone is BigInteger and not primitive so null is valid
+				}
+				return subject;
 			}
-		});
-
-		if (loggedInStudentHasThisSubject) {
-
-			// just to be safe
-			loggedInStudentHasThisSubject = false;
-			StudentSubjectEntity subject = studSubRepoS.findStudentSubjectEntityById(id);
-
-			for (int j = 0; j < subject.getStudentsList().size(); j++) {
-				// clear subject list from each subject list property of student entity to avoid infinite references
-				subject.getStudentsList().get(j).getSubjectList().clear();		//to tackle infinite references
-				// unnecessary fields will be emptied or nullified so that JsonIgnore can ignore them in results.
-				subject.getStudentsList().get(j).setEmail(null);
-				subject.getStudentsList().get(j).setPassword(null);
-				subject.getStudentsList().get(j).setPhone(null); // phone is BigInteger and not primitive so null is valid
-			}
-			return subject;
-		} else {
-			return null;
 		}
+		
+		return null;
+		
 	}
 	
 	
@@ -187,6 +192,69 @@ public class StudentDashboardController {
 	
 	
 	
+	@GetMapping("/student/test/details/{testCode}")
+	public TestEntity getTestByIdForStudent(@PathVariable("testCode") String testCode, Principal principal) {
+		
+		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+			for (int i = 0; i < student.getSubjectList().size(); i++) {
+				if (testRepoS.existsByTestCodeAndSubjectCode(testCode, student.getSubjectList().get(i).getId()) ) {
+					return testRepoS.findByTestCode(testCode);
+				}
+			}
+		return null;
+	}
+	
+
+	
+	
+	
+	
+	
+	@GetMapping("/student/generate/questions/{testCode}")
+	public List<AssessmentEntity> generateAssessmentQuestions( @PathVariable("testCode") String testCode, Principal principal ){
+		
+		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		for (int i = 0; i < student.getSubjectList().size(); i++) {
+			if (testRepoS.existsByTestCodeAndSubjectCode(testCode, student.getSubjectList().get(i).getId()) ) {
+
+				TestEntity test = testRepoS.findByTestCode(testCode);
+				
+				if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
+					&& Time.valueOf( LocalTime.now() ).after( test.getStartTime() )
+					&& Time.valueOf( LocalTime.now() ).before( test.getEndTime() ) ){
+					
+					if (test.getTestStatus().equalsIgnoreCase("pending")) {
+						test.setTestStatus("ongoing");
+					}
+					
+					if (assessmentRepoS.existsByTestCodeAndStudentUsername(testCode, principal.getName())) {
+						return assessmentRepoS.findByTestCodeAndStudentUsername(testCode, principal.getName());
+						
+					}else {
+						List<QuestionEntity> questionList = 
+								questionRepoS.findByTeacherUsernameAndCollectionCode( test.getTeacherUsername(), test.getCollectionCode());
+						Collections.shuffle(questionList);
+						
+						for (int j = 0; j < test.getTotalQuestions(); j++) {
+							AssessmentEntity asessmentQuestion =
+							  new AssessmentEntity(test.getTestCode(), student.getName(), principal.getName(), test.getSubjectCode(), questionList.get(i).getTopic(), i , questionList.get(i).getQuestionId());
+							assessmentRepoS.save(asessmentQuestion);
+						}
+						
+					  return assessmentRepoS.findByTestCodeAndStudentUsername(testCode, principal.getName());
+					}
+				}else if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
+						&& Time.valueOf( LocalTime.now() ).after( test.getEndTime() ) 
+						|| test.getStartDate().before( Date.valueOf( LocalDate.now() ) )){
+					
+					if (test.getTestStatus().equalsIgnoreCase("ongoing")) {
+						test.setTestStatus("completed");
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 	
 	
@@ -195,6 +263,84 @@ public class StudentDashboardController {
 	
 	
 	
+	@GetMapping("/student/fetch/question/details/{testCode}")
+	public List<QuestionEntity> fetchAssessmentQuestions( @PathVariable("testCode") String testCode, Principal principal ){
+	
+		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		for (int i = 0; i < student.getSubjectList().size(); i++) {
+			if (testRepoS.existsByTestCodeAndSubjectCode(testCode, student.getSubjectList().get(i).getId()) ) {
+
+				TestEntity test = testRepoS.findByTestCode(testCode);
+				
+				if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
+					&& Time.valueOf( LocalTime.now() ).after( test.getStartTime() )
+					&& Time.valueOf( LocalTime.now() ).before( test.getEndTime() ) ){
+					
+					if (test.getTestStatus().equalsIgnoreCase("pending")) {
+						test.setTestStatus("ongoing");
+					}
+					
+					List<AssessmentEntity> generatedQuestionList = 
+							assessmentRepoS.findByTestCodeAndStudentUsername(testCode, principal.getName());
+					
+					List<QuestionEntity> questionList = new ArrayList<QuestionEntity>();
+					
+					for (int j = 0; j < generatedQuestionList.size(); j++) {
+						
+					 QuestionEntity question = 	questionRepoS.findByQuestionIdAndCollectionCode(generatedQuestionList.get(i).getQuestionId(), test.getCollectionCode());
+					 question.setAnswer(null);
+					 question.setCollectionCode(null);
+					 question.setQuestionId(0);
+					 question.setTeacherUsername(null);
+					 
+					 questionList.add(question);
+					}
+					return questionList;
+					
+				}else if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
+						&& Time.valueOf( LocalTime.now() ).after( test.getEndTime() ) 
+						|| test.getStartDate().before( Date.valueOf( LocalDate.now() ) )){
+					
+					if (test.getTestStatus().equalsIgnoreCase("ongoing")) {
+						test.setTestStatus("completed");
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	
+	
+	@PutMapping("/student/save/question/choice")
+	public void saveQuestion(@RequestBody AssessmentEntity question, Principal principal) {
+		
+		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		for (int i = 0; i < student.getSubjectList().size(); i++) {
+			if (testRepoS.existsByTestCodeAndSubjectCode(question.getTestCode(), student.getSubjectList().get(i).getId()) ) {
+
+				TestEntity test = testRepoS.findByTestCode(question.getTestCode());
+				
+				if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
+					&& Time.valueOf( LocalTime.now() ).after( test.getStartTime() )
+					&& Time.valueOf( LocalTime.now() ).before( test.getEndTime() ) ){
+					
+					AssessmentEntity q = 
+							assessmentRepoS.findByTestCodeAndQuestionIdAndStudentUsername(question.getTestCode(), question.getQuestionId(), principal.getName());
+					q.setSelectedChoice(question.getSelectedChoice());
+					assessmentRepoS.save(q);
+					
+				}else if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
+						&& Time.valueOf( LocalTime.now() ).after( test.getEndTime() ) 
+						|| test.getStartDate().before( Date.valueOf( LocalDate.now() ) )){
+					
+					if (test.getTestStatus().equalsIgnoreCase("ongoing")) {
+						test.setTestStatus("completed");
+					}
+				}
+			}
+		}
+	}
 	
 	
 	
@@ -202,7 +348,6 @@ public class StudentDashboardController {
 	
 	
 	
-	// profile update methods here
 	
 	
 	

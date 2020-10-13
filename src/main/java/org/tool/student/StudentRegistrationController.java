@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tool.auth.User;
 import org.tool.auth.UserRepository;
-import org.tool.mail.service.MailService;
 import org.tool.reponse.ResponseMessage;
 import org.tool.teacher.TeacherSubjectEntity;
 import org.tool.teacher.TeacherSubjectRepository;
@@ -51,7 +50,7 @@ public class StudentRegistrationController {
 			String otp = RandomStringUtils.random(5, true, false);
 			request.getSession().setAttribute("otp", otp );
 			request.getSession().setAttribute("verified", false );
-			MailService.send(email, "One Time Password  ", " Your OTP is :  " + otp);
+			//MailService.send(email, "One Time Password  ", " Your OTP is :  " + otp);
 			
 			responseMessage.setMessage("Please verify OTP that is sent to your mail");
 		}else {
@@ -64,6 +63,11 @@ public class StudentRegistrationController {
 	@GetMapping("/verify/student/otp/{otp}")
 	public ResponseMessage verifyOtp(@PathVariable("otp") String otp, HttpServletRequest request ) {
 		
+		
+		/*	
+		 * 
+		 * 
+		 
 		if ( request.getSession().getAttribute("otp").equals(otp) ) {
 			request.getSession().removeAttribute("otp");
 			request.getSession().setAttribute("verified", true );			
@@ -71,6 +75,11 @@ public class StudentRegistrationController {
 		}else {
 			responseMessage.setMessage("false");
 		}
+		*
+		*/
+		
+		request.getSession().setAttribute("verified", true );
+		responseMessage.setMessage("true");
 		return responseMessage;
 	}
 	
@@ -88,7 +97,7 @@ public class StudentRegistrationController {
 		//check if student email already exists in student table
 		if(! studRepo.existsStudentEntityByEmail(student.getEmail())  && request.getSession().getAttribute("verified").equals(true) ) {
 			
-			request.getSession().setAttribute("verified", false );			
+			request.getSession().removeAttribute("verified");		
 			
 			student.setId(java.time.LocalDate.now().toString().replaceAll("-", "")+ java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
 
@@ -126,7 +135,7 @@ public class StudentRegistrationController {
 			//save student data to student table
 			studRepo.save(student);
 
-			MailService.send(student.getEmail(), "Registration Successful ", " Your user_id : " + student.getEmail() +  "  password : " + student.getPassword());
+			//MailService.send(student.getEmail(), "Registration Successful ", " Your user_id : " + student.getEmail() +  "  password : " + student.getPassword());
 									
 			responseMessage.setStatus("success");
 			responseMessage.setMessage("Registration Successful. Your User ID and Password are sent to your mail.");

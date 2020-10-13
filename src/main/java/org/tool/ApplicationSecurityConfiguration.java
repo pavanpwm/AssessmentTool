@@ -70,7 +70,7 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
 		http
 				.csrf().disable()
 				.authorizeRequests()
-				.antMatchers("/treg.html", "/sreg.html", "/homepage.html", "/check/login", "/student/register", "/teacher/register" , "/all/teacher/subject/list", "/generate/**", "/verify/**").permitAll()
+				.antMatchers("/treg.html", "/sreg.html", "/homepage.html", "/check/login", "/student/register", "/teacher/register" , "/all/teacher/subject/list", "/generate/**", "/verify/**", "/test/results/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				

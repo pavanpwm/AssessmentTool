@@ -226,12 +226,13 @@
 <br>
 <br>
 <br>
-<br>
+<div id="spin" style="text-align:center;font-size:24px" hidden>
+<i class="fa fa-circle-o-notch fa-spin" ></i>
+</div>
+
 <div id="teacherRegistrationForm" class="container" >
 <h4 for="register">Teacher Registration:</h4>
-<div id="spin" hidden>
-<i class="fa fa-circle-o-notch fa-spin" style="text-align:center;font-size:24px"></i>
-</div>
+
 	<div class="form-group" >
       <label for="name">Name:</label>
       <input type="text"  class="form-control" id="name" placeholder="Enter name" name="name"  >
@@ -270,7 +271,6 @@
 
 
 <div id="otpForm" class="container" hidden>
-<br>
 <h4 for="register">Enter one time password  that was sent to your email </h4>
 <br>
     <div class="form-group">
@@ -354,6 +354,9 @@ document.getElementById(event.target.id).parentElement.remove();
 
 
 function submitForm(){
+	
+	
+	document.getElementById("spin").style.display = "block";
 
 	var tempArray = document.getElementsByName("subjects[]");
 	
@@ -388,10 +391,12 @@ function submitForm(){
                     alert(s.status);
 					console.log(s);
 					document.getElementById("spin").style.display = "none";
+					location.reload();
 				},
 				error: function(){
 					alert("error");
 					document.getElementById("spin").style.display = "none";
+					location.reload();
 				}
 			});
 }

@@ -20,26 +20,60 @@ public class AssessmentEntity {
 	@Column(name = "test_code")
 	private String testCode;
 	
+	
+	@Column(name = "student_name")
+	private String studentName;
+	
 	@Column(name = "student_username")
 	private String studentUsername;
 	
-	@Column(name = "qestions_generated")
-	private String questionGenerated;
+	@Column(name = "subject_code")
+	private String subjectCode;
 	
-	@Column(name = "score")
-	private int score;
+	@Column(name = "topic")
+	private String topic;
+	
+	@Column(name = "question_index")
+	private int questionIndex;
+	
+	@Column(name = "question_id")
+	private int questionId;
+	
+	@Column(name = "selected_choice")
+	private String selectedChoice;
+	
+	@Column(name = "marks")
+	private int marks;
 
 	public AssessmentEntity() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public AssessmentEntity(int id, String testCode, String studentUsername, String questionGenerated, int score) {
+	public AssessmentEntity(int id, String testCode, String studentName, String studentUsername, String subjectCode,
+			String topic, int questionIndex, int questionId, String selectedChoice, int marks) {
 		super();
 		this.id = id;
 		this.testCode = testCode;
+		this.studentName = studentName;
 		this.studentUsername = studentUsername;
-		this.questionGenerated = questionGenerated;
-		this.score = score;
+		this.subjectCode = subjectCode;
+		this.topic = topic;
+		this.questionIndex = questionIndex;
+		this.questionId = questionId;
+		this.selectedChoice = selectedChoice;
+		this.marks = marks;
+	}
+
+	public AssessmentEntity(String testCode, String studentName, String studentUsername, String subjectCode,
+			String topic, int questionIndex, int questionId) {
+		super();
+		this.testCode = testCode;
+		this.studentName = studentName;
+		this.studentUsername = studentUsername;
+		this.subjectCode = subjectCode;
+		this.topic = topic;
+		this.questionIndex = questionIndex;
+		this.questionId = questionId;
 	}
 
 	public int getId() {
@@ -58,6 +92,14 @@ public class AssessmentEntity {
 		this.testCode = testCode;
 	}
 
+	public String getStudentName() {
+		return studentName;
+	}
+
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+
 	public String getStudentUsername() {
 		return studentUsername;
 	}
@@ -66,32 +108,54 @@ public class AssessmentEntity {
 		this.studentUsername = studentUsername;
 	}
 
-	public String getQuestionGenerated() {
-		return questionGenerated;
+	public String getSubjectCode() {
+		return subjectCode;
 	}
 
-	public void setQuestionGenerated(String questionGenerated) {
-		this.questionGenerated = questionGenerated;
+	public void setSubjectCode(String subjectCode) {
+		this.subjectCode = subjectCode;
 	}
 
-	public int getScore() {
-		return score;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
-	@Override
-	public String toString() {
-		return "AssessmentEntity [id=" + id + ", testCode=" + testCode + ", studentUsername=" + studentUsername
-				+ ", questionGenerated=" + questionGenerated + ", score=" + score + "]";
+	public int getQuestionIndex() {
+		return questionIndex;
 	}
 
-	
+	public void setQuestionIndex(int questionIndex) {
+		this.questionIndex = questionIndex;
+	}
 
-	
-	
+	public int getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(int questionId) {
+		this.questionId = questionId;
+	}
+
+	public String getSelectedChoice() {
+		return selectedChoice;
+	}
+
+	public void setSelectedChoice(String selectedChoice) {
+		this.selectedChoice = selectedChoice;
+	}
+
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
 	
 	
 	

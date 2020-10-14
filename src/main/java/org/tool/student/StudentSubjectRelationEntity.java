@@ -2,6 +2,8 @@ package org.tool.student;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -11,24 +13,34 @@ public class StudentSubjectRelationEntity {
 	
 	
 	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int id;
+
 	@Column(name = "s_id")
 	private String studentId;
 	
 	@Column(name = "ss_id")
 	private String subjectId;
-	
-	
-	
 
 	public StudentSubjectRelationEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StudentSubjectRelationEntity(String studentId, String subjectId) {
+	public StudentSubjectRelationEntity(int id, String studentId, String subjectId) {
 		super();
+		this.id = id;
 		this.studentId = studentId;
 		this.subjectId = subjectId;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getStudentId() {
@@ -46,6 +58,11 @@ public class StudentSubjectRelationEntity {
 	public void setSubjectId(String subjectId) {
 		this.subjectId = subjectId;
 	}
+	
+	
+	
+
+	
 	
 
 	

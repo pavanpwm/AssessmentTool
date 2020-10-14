@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 public interface StudentSubjectRelationEntityRepository extends CrudRepository<StudentSubjectRelationEntity, String> {
 	
 	
-	//@Query("delete from StudentSubjectRalationEntity s where s.studentId = ?1 and s.subjectId = ?2")
-	//void deleteStudentSubjectRalationEntityByStudentIdAndSubjectId(String studentId, String subjectId);
+
+	void deleteByStudentIdAndSubjectId(String studentId, String subjectId);
 	
 	
 	@Modifying

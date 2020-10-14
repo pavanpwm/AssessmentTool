@@ -72,7 +72,7 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
 				.authorizeRequests()
 				.antMatchers("/treg.html", "/sreg.html", "/homepage.html", "/check/login", "/student/register", 
 						"/teacher/register" , "/all/teacher/subject/list", "/generate/**", "/verify/**", 
-						"/test/results/**", "/exam.html", "/results.html").permitAll()
+						"/test/results/**", "/exam.html", "/results.html", "/forgotpass.html", "/forgot/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				

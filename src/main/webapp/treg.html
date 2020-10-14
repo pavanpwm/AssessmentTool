@@ -388,7 +388,7 @@ function submitForm(){
 				data: JSON.stringify(formData),
 				url: "/teacher/register",
 				success: function(s) {
-                    alert(s.status);
+                    alert(s.message);
 					console.log(s);
 					document.getElementById("spin").style.display = "none";
 					location.reload();

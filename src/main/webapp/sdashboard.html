@@ -109,9 +109,9 @@ body {
     <b><h5 id="headerhere">Home</b></h5>
   </header>
   
-  
-  
-  
+ <div id="alert" ></div>
+
+
 
 <div id="hidden"  hidden></div><br>
 <div id="staticContent"  style="margin:10px"></div><br>
@@ -194,33 +194,22 @@ function getStudentDetails(){
         dataType: "json",
         url: "/student/details",
         success: function(s) {
-
-          document.getElementById("useridhere").innerHTML = s.usn;
-          document.getElementById("usernamehere").innerHTML = s.name;
-          getSubjects();
-          console.log(s);
-
+		
+        	if (s == null ) {
+    			var str = 
+    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>There was a problem getting details</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		}else{
+    			document.getElementById("useridhere").innerHTML = s.usn;
+          		document.getElementById("usernamehere").innerHTML = s.name;
+          		getSubjects();
+          		console.log(s);
+    		}
         }
      });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -250,9 +239,19 @@ function getSubjects(){
         dataType: "json",
         url: "/student/subject/list",
         success: function(s) {
-          subjectList = s;
-          displaySubjects();
-          console.log(s);
+        
+        	if (s == null ) {
+        		var str = 
+        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+        			'<strong>There was a problem in getting subjects!</strong></div></div>';
+        		document.getElementById("alert").innerHTML = str;
+        	}else{
+        		subjectList = s;
+          		displaySubjects();
+          		console.log(s);
+        	}
+          
 
         }
       });
@@ -300,6 +299,7 @@ function getStudents(subjectId){
 
 	
 	document.getElementById("headerhere").innerHTML = "Students List For Subject_Id : " + subjectId ;
+	document.getElementById("staticContent").innerHTML = "" ;
 	console.log(subjectId);
 	
 			$.ajax({
@@ -308,12 +308,25 @@ function getStudents(subjectId){
 				url: "/student/subject/" +  subjectId +   "/student/list",
 				success: function(s) {
 					
-					console.log(s);
-          			studentList = s.studentsList;
-          			initTable(subjectId);
-					
-
-				}
+					if (s == null ) {
+						var str = 
+							'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+							'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+							'<strong>There was a problem getting students list</strong></div></div>';
+						document.getElementById("alert").innerHTML = str;
+					}else{
+						console.log(s);
+          				studentList = s.studentsList;
+          				initTable(subjectId);
+					}
+				},
+				error: function(){
+	        		var str = 
+	        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+	        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+	        			'<strong>There was a problem adding students list</strong></div></div>';
+	        		document.getElementById("alert").innerHTML = str;
+	        	}
 			});
 	}
 
@@ -428,13 +441,39 @@ function addSubject(){
         dataType: "json",
         url: "/student/add/subject",
         success: function(s) {
-          alert(s.status);
-          console.log(s);
-          getSubjects();
-        }
+        	if (s == null ) {
+        		var str = 
+        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+        			'<strong>There was a problem adding subject</strong></div></div>';
+        		document.getElementById("alert").innerHTML = str;
+        	}else{
+          		console.log(s);
+          		getSubjects();
+          		var str = 
+        			'<div class="container"><div class="alert alert-info alert-dismissible">'+
+        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+        			'<strong>Subject added.</strong></div></div>';
+        		document.getElementById("alert").innerHTML = str;
+        	}
+        },
+        error: function(){
+    		var str = 
+    			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    			'<strong>There was a problem adding subject</strong></div></div>';
+    		document.getElementById("alert").innerHTML = str;
+    	}
       });
 	
 }
+
+
+
+
+
+
+
 
 
 
@@ -449,7 +488,22 @@ function deleteSubject(id){
 			dataType: "json",
 			url: "/student/delete/subject/" +  id,
 			success: function(s) {
-	  			getSubjects();
+				
+				if (s == null ) {
+					var str = 
+						'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+						'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+						'<strong>There was a problem getting details</strong></div></div>';
+					document.getElementById("alert").innerHTML = str;
+				}else{
+					var str = 
+						'<div class="container"><div class="alert alert-info alert-dismissible">'+
+						'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+						'<strong>Subject deleted</strong></div></div>';
+					document.getElementById("alert").innerHTML = str;
+					getSubjects();
+				}
+	  			
 
 			}
 		});
@@ -517,6 +571,16 @@ function getTests(){
 	        dataType: "json",
 	        url: "/student/test/list",
 	        success: function(s) {
+	        	
+	        	if (s == null ) {
+	        		var str = 
+	        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+	        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+	        			'<strong>There was a problem getting tests</strong></div></div>';
+	        		document.getElementById("alert").innerHTML = str;
+	        	}else{
+	        	
+	        	
 	          tests = s;
 	          contentPlace.innerHTML = "";	
 	          
@@ -562,18 +626,23 @@ function getTests(){
 							 str +=	'<a class="btn btn-success btn-sm pull-right"  href="/exam.html?testCode='+ s[i].testCode  +'" target="_blank" >Open Test</a><br><br>'+
 								'</div>'+
 								'</div></div>';
-							}else if(s[i].testStatus == "completed"){
+						}else if(s[i].testStatus == "completed"){
 							  str += '<a class="btn btn-success btn-sm pull-left"  href="/results.html?testCode='+ s[i].testCode  +'" target="_blank" >Results</a><br><br>'+
 								'</div>'+
 								'</div></div>';
-							}
+						}else{
+							str +='</div>'+
+							'</div></div>';
+						}
 						
 				}
 				str += '</div></div>';
 				
 				contentPlace.innerHTML = str;
 
-	          console.log(s);
+	          	console.log(s);
+	          	
+	        	}
 
 	        }
 	      });
@@ -687,15 +756,6 @@ function changeMenuItemColor(id){
 }
 
 
-
-  function getRandomColor() {
-                  var letters = 'BCDEF'.split('');
-                  var color = '#';
-                  for (var i = 0; i < 6; i++ ) {
-                      color += letters[Math.floor(Math.random() * letters.length)];
-                  }
-                  return color;
-  }
 
 
 

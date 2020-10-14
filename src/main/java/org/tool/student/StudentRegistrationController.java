@@ -93,8 +93,8 @@ public class StudentRegistrationController {
 	@PostMapping("/student/register")
 	public ResponseMessage registerStudent(@RequestBody StudentEntity student, HttpServletRequest request ) {
 		
-		
-		//check if student email already exists in student table
+		try {
+			//check if student email already exists in student table
 		if(! studRepo.existsStudentEntityByEmail(student.getEmail())  && request.getSession().getAttribute("verified").equals(true) ) {
 			
 			request.getSession().removeAttribute("verified");		
@@ -137,24 +137,29 @@ public class StudentRegistrationController {
 
 			//MailService.send(student.getEmail(), "Registration Successful ", " Your user_id : " + student.getEmail() +  "  password : " + student.getPassword());
 									
-			responseMessage.setStatus("success");
+			responseMessage.setMessage("success");
 			responseMessage.setMessage("Registration Successful. Your User ID and Password are sent to your mail.");
 			return  responseMessage;
 			
-		}else {
+		  }
 			
-			// if email already exists in db
-			responseMessage.setStatus("failure");
-			responseMessage.setMessage("Something went worng!! Please try again.");
-			return responseMessage;
+		} catch (Exception e) {
+			return null;
 		}
-	
-		
-		
+		return null;
 	}
+
 	
 	
-	 
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

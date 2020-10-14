@@ -75,7 +75,7 @@ public class StudentEntity {
 	//Associations marked as mappedBy must not define database mappings like @JoinTable or @JoinColumn
 	// therefore we will send @jointable to subject entity
 	@JoinTable(
-	        name = "students_to_subjects",		
+	        name = "students_to_subjects",
 	        joinColumns = {
 	            @JoinColumn(name = "s_id")    
 	        },

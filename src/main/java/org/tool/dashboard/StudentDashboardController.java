@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.tool.auth.UserRepository;
-import org.tool.question.collection.CollectionRepository;
 import org.tool.question.collection.QuestionEntity;
 import org.tool.question.collection.QuestionRepository;
 import org.tool.reponse.ResponseMessage;
@@ -28,7 +26,6 @@ import org.tool.student.StudentRepository;
 import org.tool.student.StudentSubjectEntity;
 import org.tool.student.StudentSubjectRelationEntityRepository;
 import org.tool.student.StudentSubjectRepository;
-import org.tool.teacher.TeacherRepository;
 import org.tool.teacher.TeacherSubjectEntity;
 import org.tool.teacher.TeacherSubjectRepository;
 import org.tool.test.AssessmentEntity;
@@ -40,8 +37,6 @@ import org.tool.test.TestRepository;
 @PreAuthorize("hasRole('ROLE_STUDENT')")
 public class StudentDashboardController {
 
-	@Autowired
-	private TeacherRepository teacherRepoS;
 
 	@Autowired
 	private TeacherSubjectRepository teacherSubjectRepoS;
@@ -51,12 +46,6 @@ public class StudentDashboardController {
 
 	@Autowired
 	private StudentSubjectRepository studSubRepoS;
-
-	@Autowired
-	private UserRepository userRepoS;
-
-	@Autowired
-	private CollectionRepository collectionRepoS;
 
 	@Autowired
 	private QuestionRepository questionRepoS;
@@ -81,11 +70,17 @@ public class StudentDashboardController {
 	@GetMapping("/student/details")
 	public StudentEntity getStudentDetails(Principal principal) {
 		
-		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		try {
+			StudentEntity student = studentRepoS.findByEmail(principal.getName());
 		student.setPassword(null);
 		student.getSubjectList().clear();
 		
 		return student;
+		} catch (Exception e) {
+			return null;
+		}
+		
+		
 	}
 	
 
@@ -94,19 +89,26 @@ public class StudentDashboardController {
 	@GetMapping("/student/subject/list")
 	public List<StudentSubjectEntity> getAllStudenSubjectEntities(Principal principal) {
 
-		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		try {
+			StudentEntity student = studentRepoS.findByEmail(principal.getName());
 		for (int i = 0; i < student.getSubjectList().size(); i++) {
 			student.getSubjectList().get(i).getStudentsList().clear();
 		}
 		return student.getSubjectList();
+		} catch (Exception e) {
+			return null;
+		}
+		
 	}
 	
 	
 	@PostMapping("/student/add/subject")
 	public ResponseMessage addStudentSubject(@RequestBody StudentSubjectEntity studentSubject, Principal principal) {
 		
-		StudentEntity student = studentRepoS.findByEmail(principal.getName());
-		TeacherSubjectEntity teacherSubject;
+		try {
+			StudentEntity student = studentRepoS.findByEmail(principal.getName());
+			TeacherSubjectEntity teacherSubject;
+			
 		if ( teacherSubjectRepoS.existsTeacherSubjectEntityById( studentSubject.getId()) ) {
 			
 			teacherSubject = teacherSubjectRepoS.findTeacherSubjectEntityById( studentSubject.getId() );
@@ -114,25 +116,32 @@ public class StudentDashboardController {
 			studentSubject.getStudentsList().add(student);
 			student.getSubjectList().add(studentSubject);
 			studentRepoS.save(student);
-			
-			responseMessageS.setStatus("added");
-		}else {
-			responseMessageS.setStatus("failed");
+			responseMessageS.setMessage("added");
+			return responseMessageS;
+		 }
+		} catch (Exception e) {
+			return null;
 		}
 		
-		return responseMessageS;
+		return null;
+		
 	}
 	
 	
 	
 	@Transactional
-	@DeleteMapping("/student/delete/{subjectId}/{studentId}")
-	public ResponseMessage removeStudentFromSubject(@PathVariable("studentId") String studentId,
-			@PathVariable("subjectId") String subjectId, Principal principal) {
+	@DeleteMapping("/student/delete/subject/{subjectId}")
+	public ResponseMessage removeStudentFromSubject(@PathVariable("subjectId") String subjectId, Principal principal) {
 		
-		studSubRelRepoS.removeByStudentIdAndSubjectId(subjectId, studentId);
-	    responseMessageS.setStatus("removed");
-		return responseMessageS;
+		try {
+			studSubRelRepoS.removeByStudentIdAndSubjectId(subjectId, studentRepoS.findByEmail(principal.getName()).getId() );
+			responseMessageS.setMessage("removed");
+			return responseMessageS;
+		} catch (Exception e) {
+			System.out.print(e);
+			return null;
+		}
+		
 		
 	}
 	
@@ -142,8 +151,9 @@ public class StudentDashboardController {
 	@GetMapping("/student/subject/{subjectcode}/student/list")
 	public StudentSubjectEntity getAllStudenSubjectEntities(@PathVariable("subjectcode") String id,
 			Principal principal) {
-
-		// first we need to check if the subject id matches with the current logged in user
+		
+		try {
+			// first we need to check if the subject id matches with the current logged in user
 		
 		StudentEntity student =   studentRepoS.findByEmail(principal.getName());
 		
@@ -161,7 +171,9 @@ public class StudentDashboardController {
 				return subject;
 			}
 		}
-		
+		} catch (Exception e) {
+			return null;
+		}
 		return null;
 		
 	}
@@ -176,7 +188,8 @@ public class StudentDashboardController {
 	@GetMapping("/student/test/list")
 	public List<TestEntity>  getStudentSubjectTests(Principal principal){
 		
-		List<TestEntity> tests = new ArrayList<TestEntity>();
+		try {
+			List<TestEntity> tests = new ArrayList<TestEntity>();
 		
 		studentRepoS.findByEmail(principal.getName()).getSubjectList().forEach(eachSubject -> {
 			tests.addAll( testRepoS.findBySubjectCode( eachSubject.getId() ) ); 
@@ -205,7 +218,12 @@ public class StudentDashboardController {
 		
 		testRepoS.saveAll(tests);
 		
-		return tests;
+			return tests;
+		} catch (Exception e) {
+			return null;
+		}
+		
+		
 	}
 	
 	
@@ -215,13 +233,19 @@ public class StudentDashboardController {
 	@GetMapping("/student/test/details/{testCode}")
 	public TestEntity getTestByIdForStudent(@PathVariable("testCode") String testCode, Principal principal) {
 		
-		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		try {
+			StudentEntity student = studentRepoS.findByEmail(principal.getName());
 			for (int i = 0; i < student.getSubjectList().size(); i++) {
 				if (testRepoS.existsByTestCodeAndSubjectCode(testCode, student.getSubjectList().get(i).getId()) ) {
 					return testRepoS.findByTestCode(testCode);
 				}
 			}
+		} catch (Exception e) {
+			return null;
+		}
+		
 		return null;
+		
 	}
 	
 
@@ -233,7 +257,9 @@ public class StudentDashboardController {
 	@GetMapping("/student/generate/questions/{testCode}")
 	public List<AssessmentEntity> generateAssessmentQuestions( @PathVariable("testCode") String testCode, Principal principal ){
 		
-		StudentEntity student = studentRepoS.findByEmail(principal.getName());
+		
+		try {
+			StudentEntity student = studentRepoS.findByEmail(principal.getName());
 		for (int i = 0; i < student.getSubjectList().size(); i++) {
 			
 			if (testRepoS.existsByTestCodeAndSubjectCode(testCode, student.getSubjectList().get(i).getId()) ) {
@@ -276,6 +302,10 @@ public class StudentDashboardController {
 				break;
 			}
 		}
+		} catch (Exception e) {
+			return null; 
+		}
+		
 		return null;
 	}
 	
@@ -351,6 +381,8 @@ public class StudentDashboardController {
 						}else {
 							  q.setMarks(test.getMarksFwap());
 						}
+					}else if (question.getSelectedChoice().isEmpty()){
+						 q.setMarks(0);
 					}
 					assessmentRepoS.save(q);
 					

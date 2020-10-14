@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+   <link rel="shortcut icon" type="image/x-icon" href="https://cdn5.vectorstock.com/i/1000x1000/78/49/wheat-oats-logo-vector-22577849.jpg" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -9,30 +10,38 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
   
-   <link rel="shortcut icon" type="image/x-icon" href="https://cdn5.vectorstock.com/i/1000x1000/78/49/wheat-oats-logo-vector-22577849.jpg" />
+  
   
 
   
   
-  <body>
+<body>
+<br>
+<div class="container" style="width: 500px" id="alert"></div>
+<br>
+
+
 <div id="loginForm" class="container" >
       <form class="form-signin" method="post" action="/login">
         <h2 class="form-signin-heading">Please sign in</h2>
         <p>
           <label for="username" class="sr-only">Email</label>
-          <input type="text" id="username" name="username" class="form-control" placeholder="Email" value="pavanpwm@gmail.com" required autofocus>
+          <input type="text" id="username" name="username" class="form-control" placeholder="Email"  required autofocus>
         </p>
         <p>
           <label for="password" class="sr-only">Password</label>
-          <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="ipjarvis" required>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Password"  required>
         </p>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
       </form>
       <hr>
       <div class="form-signin" style="text-align: center;" >
-      <a onclick="forgotPassForm()" class="btn btn-sm btn-warning pull-left" >Forgot Password</a>
+      <a href="/forgotpass.html"  class="btn btn-sm btn-warning pull-left" >Forgot Password</a>
       <strong > or </strong>
       <a href="/treg.html" class="btn btn-sm btn-info pull-right">Register</a>
       </div>
@@ -43,15 +52,19 @@
 
 
 
-
-
-
-
-
-
-
 <script type="text/javascript">
 
+var url = new URL(window.location.href);
+var search_params = url.searchParams; 
+var error = search_params.get('error');
+
+if (error == "true") {
+	var str = 
+		'<div class="alert alert-danger alert-dismissible fade show">'+
+    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+    	'<strong>Invalid credentials!</strong></div>';
+	document.getElementById("alert").innerHTML = str;
+}
 
 
 window.onload = function(){
@@ -65,9 +78,16 @@ window.onload = function(){
 			}
 		}
 	});
-	
-	
 }
+
+
+
+
+
+
+
+
+
 
 
 </script>

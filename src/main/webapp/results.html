@@ -7,11 +7,24 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://www.w3schools.com/lib/w3.js"></script>
+
+<style >
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+</style>
+
+
 </head>
 <body>
 
-<div  class="container">
-  <h2>Results</h2>
+<div  class="container ">
+  <h2 id="testCode"></h2>
   <div id=tab></div>
 </div>
 
@@ -22,6 +35,7 @@
 var url = new URL(window.location.href);
 var search_params = url.searchParams; 
 var testCode = search_params.get('testCode');
+document.getElementById("testCode").innerHTML = testCode;
 console.log(testCode);
 
 window.onload = getTestDetails();
@@ -32,7 +46,7 @@ function getTestDetails(){
         type: "GET",
         dataType: "json",
         url: "/test/results/" + testCode,
-        success: function(s) {	
+        success: function(s) {
         	initTable(s);
         }
      });
@@ -42,10 +56,14 @@ function getTestDetails(){
 
 function initTable(s){
 	
-	document.getElementById("tab").innerHTML =   '<div id="tableDiv"  class="tableCenter"><div id="resultArray" class="table-responsive" ></div></div>';
+	document.getElementById("tab").innerHTML =   '<div id="tableDiv" ><div id="resultArray" class="table-responsive" ></div></div>';
 
 
     var resultArray = s;
+    
+    for (var i = 0; i < resultArray.length; i++) {
+		delete resultArray[i].id;
+	}
 
 		var noOfResult = resultArray.length;
 
@@ -53,7 +71,7 @@ function initTable(s){
 
 			// CREATE DYNAMIC TABLE.
 			var table = document.createElement("table");
-			table.className = "table table-striped table-hover table-condensed";
+			table.className = "table table-striped table-hover center";
 			table.setAttribute('id', 'myTable');
 
 			// retrieve column header

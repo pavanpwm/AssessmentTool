@@ -14,5 +14,5 @@ public interface TeacherSubjectRepository extends CrudRepository<TeacherSubjectE
 		
 	TeacherSubjectEntity findTeacherSubjectEntityById(String id);   // takes in subject_id and return a subject if exists
 		
-	
+	boolean existsByIdAndTeacher(String subjectId, TeacherEntity teacher);
 }

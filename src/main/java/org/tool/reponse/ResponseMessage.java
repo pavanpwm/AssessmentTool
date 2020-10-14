@@ -8,10 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResponseMessage {
 	
-	private String Status;
 	
 	private String message;
-	
 	
 	
 	
@@ -20,24 +18,10 @@ public class ResponseMessage {
 
 
 
-	public ResponseMessage(String status, String message) {
-		Status = status;
+	public ResponseMessage(String message) {
 		this.message = message;
 	}
 	
-	
-
-	public String getStatus() {
-		return Status;
-	}
-
-
-
-	public void setStatus(String status) {
-		Status = status;
-	}
-
-
 
 	public String getMessage() {
 		return message;

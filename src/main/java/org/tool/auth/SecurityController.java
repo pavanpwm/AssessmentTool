@@ -23,12 +23,18 @@ public class SecurityController {
 	//if user is already logged in and goes to login page, then he is redirected his dashboard, else will remain on login page
 	@GetMapping("/check/login")
 	public ResponseMessage checkLogin(Principal principal) {
-		if(principal == null) {
-			respMessage.setStatus("false");
+		
+		try {
+			if(principal == null) {
+				respMessage.setMessage("false");
+				return respMessage;
+			}
+			respMessage.setMessage("true");
+			return respMessage;
+		} catch (Exception e) {
+			respMessage.setMessage("error");
 			return respMessage;
 		}
-		respMessage.setStatus("true");
-		return respMessage;
 	}
 	
 

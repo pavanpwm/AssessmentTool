@@ -60,7 +60,7 @@ window.onload = function(){
 		type: "GET",
 		url:"/check/login",
 		success: function(s){
-			if(s.status == "true"){
+			if(s.message == "true"){
 				window.location.replace("http://localhost:8080/redirect");
 			}
 		}

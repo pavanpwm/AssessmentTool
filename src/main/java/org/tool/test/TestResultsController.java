@@ -40,7 +40,14 @@ public class TestResultsController {
 		
 			if (test.isResultsGenerated()) {
 				
-				return testResultRepoT.findByTestCode(testCode);
+				List<TestResultsEntity> listOfResults = testResultRepoT.findByTestCode(testCode);
+				
+				for (int i = 0; i < listOfResults.size(); i++) {
+					listOfResults.get(i).setStudentUsername(null);
+					listOfResults.get(i).setTestCode(null);
+				}
+				
+				return listOfResults;
 			
 			}else {
 				
@@ -73,7 +80,6 @@ public class TestResultsController {
 				testRepoT.save(test);
 				
 				for (int i = 0; i < listOfResults.size(); i++) {
-					listOfResults.get(i).setId(0);
 					listOfResults.get(i).setStudentUsername(null);
 					listOfResults.get(i).setTestCode(null);
 				}

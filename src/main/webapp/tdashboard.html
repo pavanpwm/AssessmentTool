@@ -74,7 +74,7 @@ body {
 <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
   <div class="w3-container w3-row">
     <div class="w3-col s4">
-      <img src="https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/137409052/original/d472c30361632da1c8d8fa780f572807d78abd9f/cartoon-profile-picture-or-avatar.png" class="w3-circle w3-margin-right" style="width:46px">
+     <i class="fa fa-user-circle" style="font-size: 40px"></i>
     </div>
     <div class="w3-col s8 w3-bar">
       Welcome, <strong><p id = "usernamehere"></p><p id = "useridhere"></p></strong>
@@ -108,11 +108,10 @@ body {
 
   <!-- Header -->
   <header class="w3-container" style="padding-top:22px">
-    <b><h5 id="headerhere">Home</b></h5>
+    <b><h5 id="headerhere">Home</h5></b>
   </header>
 
-
-
+<div id="alert" ></div>
 
 
 
@@ -195,15 +194,15 @@ body {
               </div>
               <div class="form-group">
 								<label for="startDate">Start date:</label>
-								<input type="date" class="form-control" id="startDate" oninput="validateDate()"  name="startDate">
+								<input type="date" class="form-control" id="startDate"   name="startDate">
               </div>
               <div class="form-group">
 								<label for="startTime">Start time:</label>
-								<input type="time" class="form-control" id="startTime" oninput="validateStatTime()" name="startTime">
+								<input type="time" class="form-control" id="startTime"  name="startTime">
               </div>
               <div class="form-group">
 								<label for="endTime">End time:</label>
-								<input type="time" class="form-control" id="endTime" oninput="validateEndTime()" name="endTime">
+								<input type="time" class="form-control" id="endTime"  name="endTime">
               </div>
 							<button  class="btn btn-success" onclick="addTest()">Submit</button>
 						</div>
@@ -289,11 +288,18 @@ function getTeacherDetails(){
         dataType: "json",
         url: "/teacher/details",
         success: function(s) {
-
-          document.getElementById("usernamehere").innerHTML = s.name;
-          displaySubjects();
-          console.log(s);
-
+        	
+          if (s == null ) {
+			var str = 
+				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+				'<strong>There was a problem getting details</strong></div></div>';
+			document.getElementById("alert").innerHTML = str;
+		  }else{
+			  document.getElementById("usernamehere").innerHTML = s.name;
+	          displaySubjects();
+	          console.log(s);
+		  }
         }
       });
 	
@@ -347,9 +353,19 @@ function getSubjects(){
         dataType: "json",
         url: "/teacher/subject/list",
         success: function(s) {
-          subjectList = s;
-          displaySubjects();
-          console.log(s);
+
+        	if (s == null ) {
+    			var str = 
+    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>There was a problem getting subject list</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		  }else{
+    			  subjectList = s;
+         		  displaySubjects();
+          		  console.log(s);
+    		  }
+          
           
 
         }
@@ -376,8 +392,23 @@ function addSubject(){
         dataType: "json",
         url: "/teacher/add/subject/" + document.getElementById("newSubject").value,
         success: function(s) {
-          console.log(s);
-          getSubjects();
+         
+        	if (s == null ) {
+    			var str = 
+    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>There was a problem adding subject!</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		  }else{
+    			  console.log(s);
+          		  getSubjects();
+          		var str = 
+    				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>Successfully added a new subject.</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+          		  
+    		  }
         }
       });
 	
@@ -428,11 +459,18 @@ function getStudents(id){
 				url: "/teacher/subject/" +  id +   "/student/list",
 				success: function(s) {
 					
-					console.log(s);
-          			studentList = s.studentsList;
-          			initTable(id);
-					
-
+					if (s == null ) {
+						var str = 
+							'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+							'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+							'<strong>There was a problem getting student list</strong></div></div>';
+						document.getElementById("alert").innerHTML = str;
+					 }else{
+						console.log(s);
+          				studentList = s.studentsList;
+          				initTable(id);
+					 }
+	
 				}
 			});
 	}
@@ -460,12 +498,8 @@ function initTable(id){
 
 			// CREATE DYNAMIC TABLE.
 			var table = document.createElement("table");
-			//table.className = "w3-table-all w3-card-4 w3-hoverable ";
+			table.className = "table table-condensed table-bordered table-striped";
 			table.setAttribute('id', 'myTable');
-			table.style.width = '100%';
-			table.setAttribute('border', '1');
-			table.setAttribute('cellspacing', '0');
-			table.setAttribute('cellpadding', '5');
 
 			// retrieve column header
 
@@ -550,8 +584,22 @@ function deleteSubject(id){
 			dataType: "json",
 			url: "/teacher/delete/subject/" +  id,
 			success: function(s) {
-	  			getSubjects();
-
+				
+				if (s == null ) {
+	    			var str = 
+	    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+	    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+	    				'<strong>Could not delete this subject</strong></div></div>';
+	    			document.getElementById("alert").innerHTML = str;
+	    		  }else{
+	    			  getSubjects();
+	    			  
+	    			  var str = 
+		    				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+		    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		    				'<strong>Subject deleted</strong></div></div>';
+		    			document.getElementById("alert").innerHTML = str;
+	    		  }
 			}
 		});
 	  }
@@ -561,7 +609,7 @@ function deleteSubject(id){
 
 function removeStudent(subject, student){
 	
-	var r = confirm("Are you sure?");
+  var r = confirm("Are you sure?");
 	
   if (r) {
 	
@@ -570,7 +618,22 @@ function removeStudent(subject, student){
 		dataType: "json",
 		url: "/teacher/delete/" + subject + "/" +  student,
 		success: function(s) {
-			getStudents(subject);
+			
+			if (s == null ) {
+    			var str = 
+    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>There was an error removing this student!</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		  }else{
+    			  getStudents(subject);
+    			  
+    			  var str = 
+      				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+      				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+      				'<strong>Student removed!</strong></div></div>';
+      			document.getElementById("alert").innerHTML = str;
+    		  }
 		}
 	});
 	
@@ -624,16 +687,26 @@ function getCollections(){
 	          collectionList = s;
 	          console.log(s);
 	          
-	          for (var i = 0; i < collectionList.length; i++) {
+	          if (s == null ) {
+	    			var str = 
+	    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+	    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+	    				'<strong>There was an error getting collections!</strong></div></div>';
+	    			document.getElementById("alert").innerHTML = str;
+	    		  }else{
+	    			  for (var i = 0; i < collectionList.length; i++) {
 
-		    	  contentPlace.innerHTML += ' <div  class="w3-quarter w3-hover-sepia"  > ' +
+		    	      contentPlace.innerHTML += ' <div  class="w3-quarter w3-hover-sepia"  > ' +
 		    	                      ' <div class="w3-container w3-padding-16"  style="margin-top: 16px;background-color: lightblue;"> ' +
 		    	                      ' <div class="w3-right"><i class="fa fa-trash" style="color:red" onclick="deleteCollection(' + "'" + collectionList[i].collectionCode  + "'" + ')" ></i></div> ' +
 		    	                      ' <i class="fa fa-clipboard-list" ></i>  ' +
 		    	                      ' <h4 onclick="getQuestions(' + "'"  + collectionList[i].collectionCode + "'" + ')"> ' + collectionList[i].collectionName + '</h4> ' + 
 		    	                      ' </div></div> ';
 
-		    	  }
+		    	  		}
+	    		  }
+	          
+	          
 
 	        }
 	      });
@@ -680,8 +753,29 @@ function addCollection(){
         dataType: "json",
         url: "/teacher/add/collection",
         success: function(s) {
-          console.log(s);
-          getCollections();
+        	
+        	if (s == null ) {
+    			var str = 
+    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>There was an error while adding this collection!</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		  }else{
+    			  console.log(s);
+          		  getCollections();
+          		var str = 
+    				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>Collection added!</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		  }
+        },
+        error: function(s){
+        	var str = 
+    			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    			'<strong>Error adding collection. Please check subject code!</strong></div></div>';
+    		document.getElementById("alert").innerHTML = str;
         }
       });
 	
@@ -704,8 +798,23 @@ function deleteCollection(collectionCode){
         dataType: "json",
         url: "/teacher/delete/collection/" + collectionCode,
         success: function(s) {
-          console.log(s);
-          getCollections();
+        	
+        	if (s == null ) {
+    			var str = 
+    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+    				'<strong>Error in deleting this collection!</strong></div></div>';
+    			document.getElementById("alert").innerHTML = str;
+    		  }else{
+    			  var str = 
+      				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+      				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+      				'<strong>Collection deleted!</strong></div></div>';
+      			  document.getElementById("alert").innerHTML = str;
+    			  console.log(s);
+          		  getCollections();
+    		  }
+          
         }
       });
 	
@@ -766,14 +875,24 @@ function getQuestions(collectionCode){
 				dataType: "json",
 				url: "/teacher/" + collectionCode + "/question/list",
 				success: function(s) {
-					console.log(s);
-					questionList = s;
 					
-					var str = "";
-					str =
-						'<div class="container"><div class="panel-group" id="accordion">';
+					if (s == null ) {
+		    			var str = 
+		    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+		    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		    				'<strong>Error in getting questions!</strong></div></div>';
+		    			document.getElementById("alert").innerHTML = str;
+		    			
+		    		  }else{
+		    			  
+		    			console.log(s);
+						questionList = s;
+					
+						var str = "";
+						str =
+							'<div class="container"><div class="panel-group" id="accordion">';
 					    
-					for (var i = 0; i < questionList.length; i++) {
+						for (var i = 0; i < questionList.length; i++) {
 						str += 
 							'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
 					        '<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + questionList[i].questionId + '"><strong>Question '+ i + ':  </strong> ' + questionList[i].questionString + '</a><i class="fa fa-trash pull-right" onclick="deleteQuestion(' + questionList[i].questionId + ')" style="color:red"></i></h4></div>' +
@@ -793,10 +912,11 @@ function getQuestions(collectionCode){
 							}
 						}
 						
-					}
-					str += '</div></div>';
+						}
+						str += '</div></div>';
 					
-					contentPlace.innerHTML = str;
+						contentPlace.innerHTML = str;
+		    		  }
 				}
 		});
 	}
@@ -816,10 +936,23 @@ function deleteQuestion(questionId){
 		        dataType: "json",
 		        url: "/teacher/delete/question/" + questionId,
 		        success: function(s) {
-		        	 console.log(s);
-			         $('#myModal').modal('hide');
-			         getQuestions(document.getElementById("hidden").innerHTML);
-		          
+		        	
+		        	if (s == null ) {
+		        		var str = 
+		    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+		    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		    				'<strong>Error in deleting question!</strong></div></div>';
+		    			document.getElementById("alert").innerHTML = str;
+		    		  }else{
+		    			  var str = 
+		    				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+		    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		    				'<strong>Question deleted!</strong></div></div>';
+		    			document.getElementById("alert").innerHTML = str;
+		    			console.log(s);
+			         	$('#myModal').modal('hide');
+			         	getQuestions(document.getElementById("hidden").innerHTML);
+		    		  }
 		        }
 		      });
 	}
@@ -895,10 +1028,23 @@ function saveQuestion(){
 		        dataType: "json",
 		        url: "/teacher/add/question",
 		        success: function(s) {
-		        	console.log(s);
+		        	 console.log(s);
 			         $('#myModal').modal('hide');
-			         getQuestions(questionData.collectionCode);
-		          
+			         
+			         if (s == null ) {
+			    			var str = 
+			    				'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+			    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+			    				'<strong>There was an error adding question!</strong></div></div>';
+			    			document.getElementById("alert").innerHTML = str;
+			    		  }else{
+			    			  getQuestions(questionData.collectionCode);
+			    			  var str = 
+				    				'<div class="container"><div class="alert alert-info alert-dismissible">'+
+				    				'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+				    				'<strong>Question added!</strong></div></div>';
+				    			document.getElementById("alert").innerHTML = str;
+			    		  }
 		        }
 		      });
 
@@ -962,6 +1108,18 @@ function getTests(){
 	        dataType: "json",
 	        url: "/teacher/test/list",
 	        success: function(s) {
+	        	
+	        	
+	          if (s == null ) {
+	        		var str = 
+	        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+	        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+	        			'<strong>Error in getting tests!</strong></div></div>';
+	        		document.getElementById("alert").innerHTML = str;
+	        		
+	          }else{
+	          
+	          
 	          tests = s;
 	          contentPlace.innerHTML = "";	
 	          
@@ -975,12 +1133,12 @@ function getTests(){
 					if (s[i].testStatus == "ongoing") {
 						str +=  
 							'<div class=" panel panel-default" ><div class="panel-heading"><h4 class="panel-title">'+
-					        '<a  data-toggle="collapse" class="glow" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a><i id="'+  s[i].testCode  +'" class="fa fa-trash pull-right" onclick="deleteTest(event)" style="color:red"></i></h4></div>' +
+					        '<a  data-toggle="collapse" class="glow" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
 					        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
 					}else if(s[i].testStatus == "completed"){
 						str +=  
 							'<div class=" panel panel-default"  ><div style="background-color:lightgreen;" class="panel-heading"><h4 class="panel-title">'+
-					        '<a  data-toggle="collapse"  data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a><i id="'+  s[i].testCode  +'" class="fa fa-trash pull-right" onclick="deleteTest(event)" style="color:red"></i></h4></div>' +
+					        '<a  data-toggle="collapse"  data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
 					        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
 					}else{
 						str +=  
@@ -1006,7 +1164,7 @@ function getTests(){
 						'<p>Test Status : ' + s[i].testStatus    + '</p>';
 						
 						if (s[i].testStatus == "completed") {
-						 str +=	'<a class="btn btn-success btn-sm pull-left"  href="/results.html?testCode='+ s[i].testCode  +'" target="_blank" >Results</a>'+
+						 str +=	'<a class="btn btn-success btn-sm pull-left"  href="/results.html?testCode='+ s[i].testCode  +'" target="_blank" >Results</a><br><br>'+
 							'</div>'+
 							'</div></div>';
 						}else{
@@ -1020,7 +1178,8 @@ function getTests(){
 				
 				contentPlace.innerHTML = str;
 
-	          console.log(s);
+	            console.log(s);
+	         }
 
 	        }
 	      });
@@ -1118,22 +1277,6 @@ function setTotalMarks(){
 
 
 
-function validateDate(){
-	
-	
-}
-
-function validateStatTime(){
-	
-	
-	
-}
-
-function validateEndTime(){
-	
-	
-	
-}
 
 
 function addTest(){
@@ -1162,10 +1305,31 @@ function addTest(){
 	        dataType: "json",
 	        url: "/teacher/add/test",
 	        success: function(s) {
-	        	console.log(s);
+	        	 console.log(s);
 		         $('#createTestModal').modal('hide');
-	         	 getTests();   
-
+		       
+		         if (s == null ) {
+		        		var str = 
+		        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+		        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		        			'<strong>Error in adding test!</strong></div></div>';
+		        		document.getElementById("alert").innerHTML = str;
+		        }else{
+		        	 getTests(); 
+		        	 var str = 
+		        			'<div class="container"><div class="alert alert-info  alert-dismissible">'+
+		        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		        			'<strong>Test added!</strong></div></div>';
+		        	document.getElementById("alert").innerHTML = str;
+		        }
+	        },
+	        error: function(s){
+	        	var str = 
+        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+        			'<strong>Please check if date, time and total questions entered are correct!</strong></div></div>';
+        		document.getElementById("alert").innerHTML = str;
+		        $('#createTestModal').modal('hide');
 	        }
 	    });
 
@@ -1187,7 +1351,20 @@ function deleteTest(event){
 	        success: function(s) {
 	        	 console.log(s);
 		         $('#myModal').modal('hide');
-		         getTests();   	          
+		         if (s == null ) {
+		        		var str = 
+		        			'<div class="container"><div class="alert alert-danger alert-dismissible">'+
+		        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		        			'<strong>Error in deleting test!</strong></div></div>';
+		        		document.getElementById("alert").innerHTML = str;
+		          }else{
+		        	   getTests();  
+		        	   var str = 
+		        			'<div class="container"><div class="alert alert-info  alert-dismissible">'+
+		        			'<a href="#" class="close" data-dismiss="alert" style="color:black" aria-label="close"><strong>X</strong></a>'+
+		        			'<strong>Test deleted!</strong></div></div>';
+		        		document.getElementById("alert").innerHTML = str;
+		          }	          
 	        }
 	      });
 	}
@@ -1280,14 +1457,6 @@ function changeMenuItemColor(id){
 
 
 
-  function getRandomColor() {
-                  var letters = 'BCDEF'.split('');
-                  var color = '#';
-                  for (var i = 0; i < 6; i++ ) {
-                      color += letters[Math.floor(Math.random() * letters.length)];
-                  }
-                  return color;
-  }
 
 
 

@@ -63,9 +63,15 @@ public class AdminDashboardController {
 
 		@GetMapping("/all/teacher/subject/list")
 		public List<TeacherSubjectEntity> getAllTeacherSubjectEntities() {
-			List<TeacherSubjectEntity> t = new ArrayList<TeacherSubjectEntity>();
-			teacherSubjectRepoA.findAll().forEach(t::add);
-			return t;
+			try {
+				List<TeacherSubjectEntity> t = new ArrayList<TeacherSubjectEntity>();
+				teacherSubjectRepoA.findAll().forEach(t::add);
+				return t;
+			} catch (Exception e) {
+				return null;
+				
+			}
+		
 
 		}
 	

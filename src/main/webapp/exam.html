@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
-<title>W3.CSS Template</title>
+<title>Assessment</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -17,6 +19,7 @@ color:black;
 
 
 .question{
+font-size:16px;
 margin:4px;
 background-color:lavender;
 border: 1px solid black;
@@ -27,13 +30,18 @@ padding-left:10px;
 padding-right:7px;
 }
 
+input[type=radio] {
+    width: 20px;
+    height: 20px;
+}
+
 </style>
 <body class="w3-light-grey">
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
   <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
-  <span class="w3-bar-item w3-right">Logo</span>
+  <span class="w3-bar-item w3-right" id ="timerHere">Time</span>
 </div>
 
 <!-- Sidebar/menu -->
@@ -43,7 +51,8 @@ padding-right:7px;
       <img src="/w3images/avatar2.png" class="w3-circle w3-margin-right" style="width:46px">
     </div>
     <div class="w3-col s8 w3-bar">
-      <span>Hello <strong>Mikey </strong></span><br>
+      <span>Hello <strong id="userNameHere"> </strong></span><br>
+      <strong id="testNameHere"> </strong><br>
     </div>
   </div>
   <hr>
@@ -54,25 +63,8 @@ padding-right:7px;
   </div>
 
 
-
-<div style="margin-left:7px">
-	  <h4 style="margin-left:7px" >Questions</h4>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-green w3-border w3-border-red">0</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-red">2342</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+23</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-green w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+23</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-green w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-green w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-green w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+</button>
-	  <button style="margin:7px" class="w3-button-mod w3-round  w3-border w3-border-black">+</button>
+<div id="menuPlace">
 </div>
-
 </nav>
 
 
@@ -96,19 +88,9 @@ padding-right:7px;
 <br>
 
 
+<div id="questionPlace">
 
-	  <div class="question">
-Question 1 : <br><br>
-What is your gender?
-<hr>
-<input type="radio" id="male" name="gender" value="male">
-<label for="male">hese days JavaScript is the foundation of very new technologies, Front-End frameworks, etc. One of thhese days JavaScript is the foundation of very new technologies, Front-End frameworks, etc. One of th</label><br>
-<br><input type="radio" id="female" name="gender" value="female">
-<label for="female">Female</label><br>
-<br><input type="radio" id="other" name="gender" value="other">
-<label for="other">Other</label>
-
-		</div>
+</div>
 
 
 
@@ -127,6 +109,7 @@ What is your gender?
 
 
 </div>
+
 
 <script>
 // Get the Sidebar
@@ -151,11 +134,286 @@ function w3_close() {
   mySidebar.style.display = "none";
   overlayBg.style.display = "none";
 }
-</script>
 
 
 
-<script >
+
+
+
+
+
+var url = new URL(window.location.href);
+var search_params = url.searchParams; 
+var testCode = search_params.get('testCode');
+console.log(testCode);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.onload = getTestDetails();
+
+
+var testDetails = {};
+var generatedList = [];
+var questionDetails = {};
+var index = 1;
+var sqlEndTime;
+
+
+
+
+
+
+
+function getTestDetails(){
+	
+	
+	
+	$.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/student/details",
+        success: function(s) {
+        	
+          document.getElementById("userNameHere").innerHTML = s.name;
+          console.log(s);
+
+        }
+     });
+	
+	
+	
+	
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: "/student/test/details/" + testCode,
+		success: function(s){
+			testDetails = s;
+			console.log(s);
+			document.getElementById("testNameHere").innerHTML = s.testName;
+			
+			var sqlDate = s.startDate.split("-");
+			var sqlStartTime = s.startTime.split(":")
+			var startTime = new Date(sqlDate[0], sqlDate[1]-1, sqlDate[2], sqlStartTime[0], sqlStartTime[1], sqlStartTime[2]);
+			
+			if ( new Date() < startTime ) {
+				alert("The test has not started yet.");
+
+			}else{
+				var endTime = s.endTime.split(":");
+				sqlEndTime = new Date(sqlDate[0], sqlDate[1]-1, sqlDate[2], endTime[0], endTime[1], endTime[2]);
+				generateStudentQuestions();
+				timer();
+			}
+		},
+		error: function(){
+			alert("error");
+		}
+	});
+}
+
+
+
+function timer(){
+
+	var countDownDate = sqlEndTime;
+
+	// Update the count down every 1 second
+	var x = setInterval(function() {
+
+	  // Get today's date and time
+	  var now = new Date().getTime();
+	    
+	  // Find the distance between now and the count down date
+	  var distance = countDownDate - now;
+	    
+	  // Time calculations for days, hours, minutes and seconds
+	  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+	  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+	  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+	    
+	  // Output the result in an element with id="demo"
+	  document.getElementById("timerHere").innerHTML = hours + "h "
+	  + minutes + "m " + seconds + "s remaining";
+	    
+	  // If the count down is over, write some text 
+	  if (distance < 0) {
+	    clearInterval(x);
+	    document.getElementById("timerHere").innerHTML = "EXPIRED";
+	    alert("The assessment is finshed!");
+	    window.close();
+	  }
+	}, 1000);
+	
+}
+
+
+	
+	
+
+function generateStudentQuestions(){
+		
+		
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			url: "/student/generate/questions/" + testCode,
+			success: function(s){
+				generatedList = s;
+				populateMenuPlace();
+				document.getElementById("btn"+index).click();
+			},
+			error: function(){
+				alert("error");
+			}
+		});	
+}
+		
+		
+
+function populateMenuPlace(){
+	
+	var str = '<div style="margin-left:7px"><h4 style="margin-left:7px" >Questions</h4>';
+	for (var i = 0; i < generatedList.length; i++) {
+		
+		if (generatedList[i].selectedChoice == "" || generatedList[i].selectedChoice == null) {
+			
+			if (generatedList[i].questionIndex == index) {
+				str += '<button id="btn'+generatedList[i].questionIndex+'" onclick="show('+ generatedList[i].questionId +',event)" style="margin:7px" class="w3-button-mod w3-round w3-border-red">'+generatedList[i].questionIndex+'</button>';
+			}else{
+				str += '<button id="btn'+generatedList[i].questionIndex+'" onclick="show('+ generatedList[i].questionId +',event)" style="margin:7px" class="w3-button-mod w3-round ">'+generatedList[i].questionIndex+'</button>';
+			}
+		}else if (generatedList[i].selectedChoice != "") {
+			if (generatedList[i].questionIndex == index) {
+				str += '<button id="btn'+generatedList[i].questionIndex+'" onclick="show('+ generatedList[i].questionId +',event)" style="margin:7px" class="w3-button-mod w3-round  w3-green w3-border-red">'+generatedList[i].questionIndex+'</button>';
+			}else{
+				str += '<button id="btn'+generatedList[i].questionIndex+'" onclick="show('+ generatedList[i].questionId +',event)" style="margin:7px" class="w3-button-mod w3-round  w3-green">'+generatedList[i].questionIndex+'</button>';
+			}
+		}
+		
+	}
+	str += '</div>';
+	
+	document.getElementById("menuPlace").innerHTML = str;
+	
+	
+}
+		
+
+
+
+
+
+
+function show(questionId, event){
+	
+	index = parseInt(event.target.id.match(/(\d+)/)[0]);
+	
+	populateMenuPlace();
+	
+			$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: "/student/fetch/question/details/" + testCode + "/" + questionId,
+				success: function(s){
+					questionDetails = s;
+					var choices = questionDetails.choices.split("_mjhzsgdf_");
+					
+					var str  = '<div class="question"><>Question '+ index +' : <br><br>'+ questionDetails.questionString +'<hr>';
+					
+					for (var j = 0; j < generatedList.length; j++) {
+						
+						if (generatedList[j].questionId == questionId) {
+							for (var i = 0; i < choices.length; i++) {
+								
+								if (generatedList[j].selectedChoice == choices[i]) {
+									str += '<input type="radio" id="opt'+i+'"  name="opt" value="'+ choices[i]+'" checked><label style="margin-left:10px;" for="male">'+ choices[i] +'</label><br><br>';
+
+								}else {
+									str += '<input type="radio" id="opt'+i+'" name="opt" value="'+ choices[i]+'"><label style="margin-left:10px;" for="male">'+ choices[i] +'</label><br><br>';
+								}
+						   }
+						}
+				     }
+						
+						
+						
+					
+					str += '</div><br>';
+					str += '<button class="btn btn-success pull-right" onclick="save('+questionId+') " >Save & Next</button>';
+					str += '<button class="btn btn-warning pull-left" onclick="prev('+questionId+') " >Prev</button>';
+					
+					document.getElementById("questionPlace").innerHTML = str;
+
+				},
+				error: function(){
+					alert("error");
+				}
+			});
+}
+
+
+			
+function save(questionId){
+	
+	if (index < testDetails.totalQuestions ) {
+		index = index+1;
+	}
+	
+	
+	var ele = document.getElementsByName('opt'); 
+	var opt = "";
+    
+    for(i = 0; i < ele.length; i++) { 
+        if(ele[i].checked) 
+        opt = ele[i].value;
+    } 
+	
+	var questionData = {
+		"testCode":testCode,
+		"questionId":questionId,
+		"selectedChoice":opt
+	};
+	
+	$.ajax({
+		type: "PUT",
+		contentType:"application/json",
+		data: JSON.stringify(questionData),
+		dataType: "json",
+		url: "/student/save/question/choice",
+		success: function(s){
+			generateStudentQuestions();
+		},
+		error: function(){
+			alert("error");
+		}
+	});
+}
+
+function prev(questionId){
+	if (index > 1) {
+		index = index - 1;
+	}
+	generateStudentQuestions();
+}
+
+
+
+
+
 
 
 var myRadios = document.getElementsByName('opt');
@@ -173,7 +431,12 @@ for(x = 0; x < myRadios.length; x++){
     };
 }
 
+
+
 </script>
+
+
+
 
 
 </body>

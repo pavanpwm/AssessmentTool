@@ -1,8 +1,6 @@
 package org.tool.dashboard;
 
 import java.security.Principal;
-import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -185,6 +183,28 @@ public class StudentDashboardController {
 				
 		});
 		
+		
+		for (int i = 0; i < tests.size(); i++) {
+			
+			if ( tests.get(i).getStartDate().toLocalDate().isEqual( LocalDate.now() ) 
+					&& LocalTime.now().isAfter( tests.get(i).getStartTime().toLocalTime() )
+					&& LocalTime.now().isBefore( tests.get(i).getEndTime().toLocalTime() ) ){
+					
+					if (tests.get(i).getTestStatus().equalsIgnoreCase("pending")) {
+						tests.get(i).setTestStatus("ongoing");
+					}
+			}else if ( tests.get(i).getStartDate().toLocalDate().isEqual(LocalDate.now()  ) 
+				 	&& LocalTime.now().isAfter( tests.get(i).getEndTime().toLocalTime() ) 
+					|| LocalDate.now().isAfter(tests.get(i).getStartDate().toLocalDate())  ){
+				
+				if (tests.get(i).getTestStatus().equalsIgnoreCase("ongoing")) {
+					tests.get(i).setTestStatus("completed");
+				}
+			}		
+		}
+		
+		testRepoS.saveAll(tests);
+		
 		return tests;
 	}
 	
@@ -215,13 +235,14 @@ public class StudentDashboardController {
 		
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
 		for (int i = 0; i < student.getSubjectList().size(); i++) {
+			
 			if (testRepoS.existsByTestCodeAndSubjectCode(testCode, student.getSubjectList().get(i).getId()) ) {
 
 				TestEntity test = testRepoS.findByTestCode(testCode);
 				
-				if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
-					&& Time.valueOf( LocalTime.now() ).after( test.getStartTime() )
-					&& Time.valueOf( LocalTime.now() ).before( test.getEndTime() ) ){
+				if ( test.getStartDate().toLocalDate().isEqual( LocalDate.now() ) 
+					&& LocalTime.now().isAfter( test.getStartTime().toLocalTime() )
+					&& LocalTime.now().isBefore( test.getEndTime().toLocalTime() ) ){
 					
 					if (test.getTestStatus().equalsIgnoreCase("pending")) {
 						test.setTestStatus("ongoing");
@@ -237,20 +258,22 @@ public class StudentDashboardController {
 						
 						for (int j = 0; j < test.getTotalQuestions(); j++) {
 							AssessmentEntity asessmentQuestion =
-							  new AssessmentEntity(test.getTestCode(), student.getName(), principal.getName(), test.getSubjectCode(), questionList.get(i).getTopic(), i , questionList.get(i).getQuestionId());
+							  new AssessmentEntity(test.getTestCode(), student.getName(), principal.getName(), test.getSubjectCode(), questionList.get(j).getTopic(), j+1 , questionList.get(j).getQuestionId());
 							assessmentRepoS.save(asessmentQuestion);
 						}
 						
 					  return assessmentRepoS.findByTestCodeAndStudentUsername(testCode, principal.getName());
 					}
-				}else if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
-						&& Time.valueOf( LocalTime.now() ).after( test.getEndTime() ) 
-						|| test.getStartDate().before( Date.valueOf( LocalDate.now() ) )){
+				}else if ( test.getStartDate().toLocalDate().isEqual( LocalDate.now() ) 
+						&& LocalTime.now().isAfter( test.getEndTime().toLocalTime() )
+						|| test.getStartDate().toLocalDate().isBefore(LocalDate.now()) ){
 					
 					if (test.getTestStatus().equalsIgnoreCase("ongoing")) {
 						test.setTestStatus("completed");
 					}
 				}
+				
+				break;
 			}
 		}
 		return null;
@@ -263,8 +286,8 @@ public class StudentDashboardController {
 	
 	
 	
-	@GetMapping("/student/fetch/question/details/{testCode}")
-	public List<QuestionEntity> fetchAssessmentQuestions( @PathVariable("testCode") String testCode, Principal principal ){
+	@GetMapping("/student/fetch/question/details/{testCode}/{questionId}")
+	public QuestionEntity fetchAssessmentQuestions( @PathVariable("testCode") String testCode,@PathVariable("questionId") int questionId, Principal principal ){
 	
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
 		for (int i = 0; i < student.getSubjectList().size(); i++) {
@@ -272,34 +295,27 @@ public class StudentDashboardController {
 
 				TestEntity test = testRepoS.findByTestCode(testCode);
 				
-				if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
-					&& Time.valueOf( LocalTime.now() ).after( test.getStartTime() )
-					&& Time.valueOf( LocalTime.now() ).before( test.getEndTime() ) ){
+				if ( test.getStartDate().toLocalDate().isEqual( LocalDate.now() )
+					&& LocalTime.now().isAfter( test.getStartTime().toLocalTime() )
+					&& LocalTime.now().isBefore( test.getEndTime().toLocalTime() ) ){
 					
 					if (test.getTestStatus().equalsIgnoreCase("pending")) {
 						test.setTestStatus("ongoing");
 					}
 					
-					List<AssessmentEntity> generatedQuestionList = 
-							assessmentRepoS.findByTestCodeAndStudentUsername(testCode, principal.getName());
-					
-					List<QuestionEntity> questionList = new ArrayList<QuestionEntity>();
-					
-					for (int j = 0; j < generatedQuestionList.size(); j++) {
 						
-					 QuestionEntity question = 	questionRepoS.findByQuestionIdAndCollectionCode(generatedQuestionList.get(i).getQuestionId(), test.getCollectionCode());
+					 QuestionEntity question = 	questionRepoS.findByQuestionIdAndCollectionCode(questionId, test.getCollectionCode());
 					 question.setAnswer(null);
 					 question.setCollectionCode(null);
 					 question.setQuestionId(0);
 					 question.setTeacherUsername(null);
 					 
-					 questionList.add(question);
-					}
-					return questionList;
+				
+					return question;
 					
-				}else if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
-						&& Time.valueOf( LocalTime.now() ).after( test.getEndTime() ) 
-						|| test.getStartDate().before( Date.valueOf( LocalDate.now() ) )){
+				}else if (  test.getStartDate().toLocalDate().isEqual( LocalDate.now() ) 
+						&& LocalTime.now().isAfter( test.getEndTime().toLocalTime() )
+						|| test.getStartDate().toLocalDate().isBefore(LocalDate.now()) ){
 					
 					if (test.getTestStatus().equalsIgnoreCase("ongoing")) {
 						test.setTestStatus("completed");
@@ -313,7 +329,7 @@ public class StudentDashboardController {
 	
 	
 	@PutMapping("/student/save/question/choice")
-	public void saveQuestion(@RequestBody AssessmentEntity question, Principal principal) {
+	public ResponseMessage saveQuestion(@RequestBody AssessmentEntity question, Principal principal) {
 		
 		StudentEntity student = studentRepoS.findByEmail(principal.getName());
 		for (int i = 0; i < student.getSubjectList().size(); i++) {
@@ -321,18 +337,26 @@ public class StudentDashboardController {
 
 				TestEntity test = testRepoS.findByTestCode(question.getTestCode());
 				
-				if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
-					&& Time.valueOf( LocalTime.now() ).after( test.getStartTime() )
-					&& Time.valueOf( LocalTime.now() ).before( test.getEndTime() ) ){
+				if ( test.getStartDate().toLocalDate().isEqual( LocalDate.now() )
+						&& LocalTime.now().isAfter( test.getStartTime().toLocalTime() )
+						&& LocalTime.now().isBefore( test.getEndTime().toLocalTime() ) ){
 					
 					AssessmentEntity q = 
 							assessmentRepoS.findByTestCodeAndQuestionIdAndStudentUsername(question.getTestCode(), question.getQuestionId(), principal.getName());
 					q.setSelectedChoice(question.getSelectedChoice());
+					
+					if (!question.getSelectedChoice().isEmpty()) {
+						if (questionRepoS.findByQuestionIdAndCollectionCode(question.getQuestionId(), test.getCollectionCode()).getAnswer().equals(question.getSelectedChoice())) {
+							  q.setMarks(test.getMarksFcaq());
+						}else {
+							  q.setMarks(test.getMarksFwap());
+						}
+					}
 					assessmentRepoS.save(q);
 					
-				}else if ( test.getStartDate().equals( Date.valueOf( LocalDate.now() ) ) 
-						&& Time.valueOf( LocalTime.now() ).after( test.getEndTime() ) 
-						|| test.getStartDate().before( Date.valueOf( LocalDate.now() ) )){
+				}else if (  test.getStartDate().toLocalDate().isEqual( LocalDate.now() ) 
+						&& LocalTime.now().isAfter( test.getEndTime().toLocalTime() )
+						|| test.getStartDate().toLocalDate().isBefore(LocalDate.now()) ){
 					
 					if (test.getTestStatus().equalsIgnoreCase("ongoing")) {
 						test.setTestStatus("completed");
@@ -340,6 +364,8 @@ public class StudentDashboardController {
 				}
 			}
 		}
+		
+		return responseMessageS;
 	}
 	
 	

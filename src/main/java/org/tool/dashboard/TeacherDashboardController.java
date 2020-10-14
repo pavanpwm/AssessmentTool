@@ -1,7 +1,6 @@
 package org.tool.dashboard;
 
 import java.security.Principal;
-import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -67,7 +66,7 @@ public class TeacherDashboardController {
 	private TestRepository testRepo;
 	
 	@Autowired
-	private StudentSubjectRelationEntityRepository  studSubRelRepo;;
+	private StudentSubjectRelationEntityRepository  studSubRelRepo;
 	
 	@Autowired
 	private ResponseMessage responseMessage;
@@ -270,7 +269,31 @@ public class TeacherDashboardController {
 	
 	@GetMapping("/teacher/test/list")
 	public List<TestEntity> getAllTests(Principal principal){
-		return	testRepo.findByTeacherUsername(principal.getName());
+		
+		List<TestEntity> tests = testRepo.findByTeacherUsername(principal.getName());
+		
+		for (int i = 0; i < tests.size(); i++) {
+			
+			if ( tests.get(i).getStartDate().toLocalDate().isEqual( LocalDate.now() ) 
+					&& LocalTime.now().isAfter( tests.get(i).getStartTime().toLocalTime() )
+					&& LocalTime.now().isBefore( tests.get(i).getEndTime().toLocalTime() ) ){
+					
+					if (tests.get(i).getTestStatus().equalsIgnoreCase("pending")) {
+						tests.get(i).setTestStatus("ongoing");
+					}
+			}else if ( tests.get(i).getStartDate().toLocalDate().isEqual( LocalDate.now() )
+					&& LocalTime.now().isAfter( tests.get(i).getEndTime().toLocalTime() ) 
+					|| LocalDate.now().isAfter(tests.get(i).getStartDate().toLocalDate()) ){
+				
+				if (tests.get(i).getTestStatus().equalsIgnoreCase("ongoing")) {
+					tests.get(i).setTestStatus("completed");
+				}
+			}		
+		}
+		
+		testRepo.saveAll(tests);
+
+		return	tests;
 	}
 	
 
@@ -280,10 +303,19 @@ public class TeacherDashboardController {
 	public ResponseMessage addTest(@RequestBody TestEntity test, Principal principal) {
 		
 		int totalQuestionsavailable = questionRepo.findByTeacherUsernameAndCollectionCode(principal.getName(), test.getCollectionCode()).size();
-		if ( test.getStartDate().equals(Date.valueOf(LocalDate.now())) 
-				&& test.getStartTime().after(Time.valueOf(LocalTime.now())) 
-				&& test.getEndTime().after(test.getStartTime()) 
+		
+		
+		System.out.println( LocalDate.now()  + "     " + test.getStartDate().toLocalDate() + "     " +  LocalDate.now().isEqual(test.getStartDate().toLocalDate())    );
+		System.out.println(test.getStartTime().after(Time.valueOf(LocalTime.now())));
+		System.out.println(test.getEndTime().after(test.getStartTime()) );
+		System.out.println(test.getTotalQuestions() <= totalQuestionsavailable);
+		
+		
+		if ( LocalDate.now().isEqual(test.getStartDate().toLocalDate())
+				&& test.getStartTime().toLocalTime().isAfter(LocalTime.now())
+				&& test.getEndTime().toLocalTime().isAfter(test.getStartTime().toLocalTime())
 				&& test.getTotalQuestions() <= totalQuestionsavailable ) {
+			
 			
 			test.setTestCode(test.getTestName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
 			test.setTeacherUsername(principal.getName());
@@ -292,8 +324,10 @@ public class TeacherDashboardController {
 			
 			responseMessage.setMessage("test created");
 			
-		}else if ( test.getStartDate().after(Date.valueOf(LocalDate.now()))
-				&& test.getTotalQuestions() <= totalQuestionsavailable ) {
+		}else if ( LocalDate.now().isAfter(test.getStartDate().toLocalDate())
+				   && test.getEndTime().toLocalTime().isAfter(test.getStartTime().toLocalTime())
+				   && test.getTotalQuestions() <= totalQuestionsavailable ) {
+			
 			
 			test.setTestCode(test.getTestName() + java.time.LocalTime.now().toString().replaceAll(":", "").replaceAll("\\.", ""));
 			test.setTeacherUsername(principal.getName());
@@ -307,6 +341,9 @@ public class TeacherDashboardController {
 		
 		return responseMessage;
 	}
+	
+	
+	
 	
 	
 	@PutMapping("/teacher/update/test")

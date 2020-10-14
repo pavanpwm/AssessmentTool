@@ -43,7 +43,22 @@ body {
 }
 
 
+.glow {
+  color: black;
+  -webkit-animation: glow 1s ease-in-out infinite alternate;
+  -moz-animation: glow 0.5s ease-in-out infinite alternate;
+  animation: glow 0.5s ease-in-out infinite alternate;
+}
 
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px #e60073, 0 0 40px #e60073, 0 0 50px #e60073, 0 0 100px #e60073, 0 0 100px #e60073;
+  }
+  
+  to {
+    text-shadow: 0;
+  }
+}
 
 </style>
 <body class="w3-light-grey">
@@ -186,9 +201,7 @@ function getStudentDetails(){
           console.log(s);
 
         }
-      });
-		
-	
+     });
 }
 
 
@@ -512,10 +525,25 @@ function getTests(){
 					'<div class="container"><div class="panel-group" id="accordion">';
 				    
 				for (var i = 0; i < s.length; i++) {
-					str += 
-						'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
-				        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
-				        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
+					
+					if (s[i].testStatus == "ongoing") {
+						str += 
+							'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
+					        '<a  data-toggle="collapse" class="glow" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
+					        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
+					}else if(s[i].testStatus == "completed"){
+						str += 
+							'<div class="panel panel-default"><div style="background-color:lightgreen;" class="panel-heading"><h4 class="panel-title">'+
+					        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
+					        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
+					}else{
+						str += 
+							'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
+					        '<a  data-toggle="collapse" data-parent="#accordion" href="#collapse' + s[i].testCode + '">' + s[i].testName + '</a></h4></div>' +
+					        '<div id="collapse' + s[i].testCode + '" class="panel-collapse collapse">';
+					}
+					
+					
 				        
 					str +=
 						
@@ -528,8 +556,18 @@ function getTests(){
 						'<p>Start date : ' + s[i].startDate    + '</p>'+
 						'<p>Satrt Time : ' + s[i].startTime    + '</p>'+
 						'<p>End Time : ' + s[i].endTime    + '</p>'+
-						'<p>Test Status : ' + s[i].testStatus    + '</p></div>'+
-						'</div></div>';
+						'<p>Test Status : ' + s[i].testStatus    + '</p>';
+						
+						if (s[i].testStatus == "ongoing") {
+							 str +=	'<a class="btn btn-success btn-sm pull-right"  href="/exam.html?testCode='+ s[i].testCode  +'" target="_blank" >Open Test</a>'+
+								'</div>'+
+								'</div></div>';
+							}else if(s[i].testStatus == "completed"){
+							  str + ='<a class="btn btn-success btn-sm pull-left"  href="/results.html?testCode='+ s[i].testCode  +'" target="_blank" >Results</a>'+
+								'</div>'+
+								'</div></div>';
+							}
+						
 				}
 				str += '</div></div>';
 				

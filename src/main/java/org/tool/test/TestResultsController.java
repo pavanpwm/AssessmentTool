@@ -27,10 +27,7 @@ public class TestResultsController {
 
 	@Autowired
 	private AssessmentRepository asessmentRepoT;
-	
-	
-	
-	
+
 	
 	@GetMapping("/test/results/{testCode}")
 	public List<TestResultsEntity> getResults(@PathVariable("testCode") String testCode){
@@ -74,6 +71,12 @@ public class TestResultsController {
 				testResultRepoT.saveAll(listOfResults);
 				test.setResultsGenerated(true);
 				testRepoT.save(test);
+				
+				for (int i = 0; i < listOfResults.size(); i++) {
+					listOfResults.get(i).setId(0);
+					listOfResults.get(i).setStudentUsername(null);
+					listOfResults.get(i).setTestCode(null);
+				}
 				
 				return listOfResults;
 			}

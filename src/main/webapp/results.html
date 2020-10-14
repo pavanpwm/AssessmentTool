@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Results</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div  class="container">
+  <h2>Results</h2>
+  <div id=tab></div>
+</div>
+
+
+
+<script >
+
+var url = new URL(window.location.href);
+var search_params = url.searchParams; 
+var testCode = search_params.get('testCode');
+console.log(testCode);
+
+window.onload = getTestDetails();
+
+function getTestDetails(){
+
+	$.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/test/results/" + testCode,
+        success: function(s) {	
+        	initTable(s);
+        }
+     });
+}
+
+
+
+function initTable(s){
+	
+	document.getElementById("tab").innerHTML =   '<div id="tableDiv"  class="tableCenter"><div id="resultArray" class="table-responsive" ></div></div>';
+
+
+    var resultArray = s;
+
+		var noOfResult = resultArray.length;
+
+		if(noOfResult > 0) {
+
+			// CREATE DYNAMIC TABLE.
+			var table = document.createElement("table");
+			table.className = "table table-striped table-hover table-condensed";
+			table.setAttribute('id', 'myTable');
+
+			// retrieve column header
+
+			var col = []; // define an empty array
+			for (var i = 0; i < noOfResult; i++) {
+				for (var key in resultArray[i]) {
+					if (col.indexOf(key) === -1) {
+						col.push(key);
+					}
+				}
+			}
+
+
+
+			// CREATE TABLE HEAD .
+			var tHead = document.createElement("thead");
+
+
+
+			// CREATE ROW FOR TABLE HEAD .
+			var hRow = document.createElement("tr");
+
+
+			// ADD COLUMN HEADER TO ROW OF TABLE HEAD.
+			for (var i = 0; i < col.length; i++) {
+				    var dynamicSize = 300*(i+1);
+				    document.getElementById("tableDiv").style.maxWidth = dynamicSize + "px" ;
+					var th = document.createElement("th");
+					th.innerHTML = col[i] + "<i class='fa fa-sort' style='font-size:12px'></i>";
+					var x = i+1;
+					th.setAttribute("onclick", "w3.sortHTML('#myTable', '.item', 'td:nth-child(" + x + ")')");
+					th.setAttribute("style", "cursor:pointer");
+					hRow.appendChild(th);
+			}
+			tHead.appendChild(hRow);
+			table.appendChild(tHead);
+
+
+
+			// CREATE TABLE BODY .
+			var tBody = document.createElement("tbody");
+
+			// ADD COLUMN HEADER TO ROW OF TABLE HEAD.
+			for (var i = 0; i < noOfResult; i++) {
+
+					var bRow = document.createElement("tr"); // CREATE ROW FOR EACH RECORD .
+					bRow.setAttribute("class","item");
+
+					for (var j = 0; j < col.length; j++) {
+						var td = document.createElement("td");
+						td.innerHTML = resultArray[i][col[j]];
+						bRow.appendChild(td);
+					}
+					tBody.appendChild(bRow)
+
+			}
+			table.appendChild(tBody);
+
+
+			// FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+			var divContainer = document.getElementById("tableDiv");
+			divContainer.innerHTML = "";
+			divContainer.appendChild(table);
+
+		}
+
+
+}
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

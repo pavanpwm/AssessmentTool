@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.tool.mail.service.MailService;
 import org.tool.student.StudentEntity;
 import org.tool.student.StudentRepository;
 import org.tool.teacher.TeacherEntity;
@@ -71,8 +73,18 @@ public class AdminDashboardController {
 				return null;
 				
 			}
+		}
 		
-
+		
+		@GetMapping("/homepage/contactme")
+		public String homePageContactMe(@RequestParam(name = "name") String name, @RequestParam(name = "email") String email, @RequestParam(name = "comment") String comment ) {
+			try {
+				MailService.send("service.assessment.tool@gmail.com", "Contact Me", name + "/n" + email + "/n" + comment);				
+				return "sent";
+			} catch (Exception e) {
+				return null;
+				
+			}
 		}
 	
 

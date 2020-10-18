@@ -111,7 +111,7 @@ input[type=radio] {
 <div id="questionPlace" class="unselectable"></div>
 
 
-<br><br><br><div class="container"><button class="btn btn-danger pull-right" onclick="exit()" >Exit Test</button></div>
+<br><br><br><div class="container"><a class="btn btn-danger pull-right" href="/redirect" >Exit Test</a></div>
 
 
 
@@ -335,7 +335,7 @@ function populateMenuPlace(){
 
 
 
-
+var choices = [];
 
 function show(questionId, event){
 	
@@ -349,9 +349,9 @@ function show(questionId, event){
 				url: "/student/fetch/question/details/" + testCode + "/" + questionId,
 				success: function(s){
 					questionDetails = s;
-					var choices = questionDetails.choices.split("_mjhzsgdf_");
+					choices = questionDetails.choices.split("_mjhzsgdf_");
 					
-					var str  = '<div class="question">Question '+ index +' : <br><br>'+ questionDetails.questionString +'<hr>';
+					var str  = '<div class="question">Question '+ index +' : <br><br><xmp>'+ questionDetails.questionString +'</xmp><hr>';
 					
 					for (var j = 0; j < generatedList.length; j++) {
 						
@@ -359,10 +359,10 @@ function show(questionId, event){
 							for (var i = 0; i < choices.length; i++) {
 								
 								if (generatedList[j].selectedChoice == choices[i]) {
-									str += '<input type="radio" id="opt'+i+'" ondblclick="this.checked = !this.checked"  name="opt" value="'+ choices[i]+'" checked><label style="margin-left:10px;" for="opt'+i+'">'+ choices[i] +'</label><br><br>';
+									str += '<input type="radio" id="opt'+i+'" ondblclick="this.checked = !this.checked"  name="opt"  checked><label style="margin-left:10px;" for="opt'+i+'"><xmp>'+ choices[i] +'</xmp></label><br><br>';
 
 								}else {
-									str += '<input type="radio" id="opt'+i+'" ondblclick="this.checked = !this.checked" name="opt" value="'+ choices[i]+'"><label style="margin-left:10px;" for="opt'+i+'">'+ choices[i] +'</label><br><br>';
+									str += '<input type="radio" id="opt'+i+'" ondblclick="this.checked = !this.checked" name="opt" ><label style="margin-left:10px;" for="opt'+i+'"><xmp>'+ choices[i] +'</xmp></label><br><br>';
 								}
 						   }
 						}
@@ -398,7 +398,7 @@ function save(questionId){
     
     for(i = 0; i < ele.length; i++) { 
         if(ele[i].checked) 
-        opt = ele[i].value;
+        opt = choices[i];
     } 
 	
 	var questionData = {

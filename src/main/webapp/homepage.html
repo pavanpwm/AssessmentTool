@@ -6,6 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -442,14 +443,14 @@ img.avatar {
 
 
           <div class="container" >
-         	<p style="text-align: center;color: red"  id="alert"></p>
+         	<p style="text-align: center;color: red"  id="loginerror"></p>
             <label for="uname"><b>Email:</b></label>
-            <input type="email" class="form-control form-group" id="username"  name="username" placeholder="email id" required>
+            <input type="email" class="form-control form-group" id="username"  name="username" placeholder="Email Id" required>
          
 
             <label for="psw"><b>Password:</b></label>
 
-            <input type="password" class="form-control form-group" name="password" placeholder="password" id="myInput"
+            <input type="password" class="form-control form-group" name="password" placeholder="Password" id="myInput"
               required>
             <input type="checkbox" onclick="myFunction()"> Show Password<br><br>
 
@@ -547,10 +548,10 @@ img.avatar {
 
 
 
-
   <!-- Container (Contact Section) -->
   <div id="contact" class="container-fluid bg-grey">
     <h2 class="text-center">CONTACT</h2>
+    <div id="alert"></div>
     <div class="row">
       <div class="col-sm-5">
         <p>Contact us and we'll get back to you within 24 hours.</p>
@@ -560,16 +561,17 @@ img.avatar {
       <div class="col-sm-7 slideanim">
         <div class="row">
           <div class="col-sm-6 form-group">
-            <input class="form-control" id="name" name="name" placeholder="Name" type="text" required>
+            <input class="form-control" id="name" name="name" placeholder="Name ( at least three letters)" type="text" >
           </div>
           <div class="col-sm-6 form-group">
-            <input class="form-control" id="email" name="email" placeholder="Email" type="email" required>
+            <input class="form-control" id="mail" name="email" placeholder="Email" type="email" >
           </div>
         </div>
-        <textarea class="form-control" id="comments" name="comments" placeholder="Comment" rows="5"></textarea><br>
+        <textarea class="form-control" id="comment" name="comments" placeholder="Comment ( at least 10 words)" rows="5"></textarea><br>
         <div class="row">
           <div class="col-sm-12 form-group">
-            <button class="btn btn-default pull-right" type="submit">Send</button>
+          <div  id="alert" ></div>
+            <button id="submitBtn" class="btn btn-default pull-right" onclick="contactMe()" >Send</button>
           </div>
         </div>
       </div>
@@ -596,7 +598,7 @@ img.avatar {
 	document.getElementById('id01').style.display='block';
   	var str = '<strong>**Invalid credentials!</strong>';
   	document.getElementById('username').focus();
-  	document.getElementById("alert").innerHTML = str;
+  	document.getElementById("loginerror").innerHTML = str;
   }
   
   
@@ -655,6 +657,121 @@ img.avatar {
         });
       });
     })
+    
+    
+    
+    
+   function contactMe(){
+    	
+    	
+        
+        if (!validateEmail()) {
+			
+		}else if (!validateName()) {
+			
+		}else if (!validateComment()) {
+			
+		}else if (validateEmail() &&  validateName() && validateComment() ) {
+			
+			var contact = {
+	    			"name":document.getElementById("name").value.trim(),
+	    			"email":document.getElementById("mail").value.trim(),
+	    			"comment":document.getElementById("comment").value.trim()
+	    	};
+	    	
+	    	document.getElementById("submitBtn").innerHTML = '<i id="spin" style="text-align:center;font-size:20px" class="fa fa-circle-o-notch fa-spin" ></i> Sending message';
+	        document.getElementById("submitBtn").disabled = true;
+			
+			
+			$.ajax({
+	    		
+	    		type:"GET",
+	    		data: contact,
+	    		dataType: "text",
+	    		url: "/homepage/contactme",
+	    		success: function(s) {
+	    			
+	    			if (s == "sent") {
+	    				document.getElementById("submitBtn").disabled = true;
+	    				document.getElementById("name").disabled = true;
+	    				document.getElementById("mail").disabled = true;
+	    				document.getElementById("comment").disabled = true;
+	    				document.getElementById("submitBtn").innerHTML = 'Submitted';
+	    				var str = '<div class="alert alert-info alert-dismissible">'+
+	      						   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Your comment has been recieved!</strong></div>';
+	    				document.getElementById("alert").innerHTML = str;
+	    			}else{
+	    				document.getElementById("submitBtn").innerHTML = 'Submit';
+	    				document.getElementById("submitBtn").disabled = false;
+	    				var str = '<div class="alert alert-danger alert-dismissible">'+
+	    				   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Couldnt recieve your message! Please try again after some time</strong></div>';
+	    				document.getElementById("alert").innerHTML = str;
+	    			}
+	    			
+	    		},
+	    		error: function(){
+	    			document.getElementById("submitBtn").innerHTML = 'Submit';
+	    			document.getElementById("submitBtn").disabled = false;
+	    			var str = '<div class="alert alert-danger alert-dismissible">'+
+	    			   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Error: Couldnt recieve your message! Please try again after some time.</strong></div>';
+	    			document.getElementById("alert").innerHTML = str;
+	    		}
+	    	});
+		}
+    	
+    	
+    	
+    	
+    	
+    	
+    }
+    
+    
+    function validateEmail(){
+    	var x=document.getElementById("mail").value;  
+    	var atposition=x.indexOf("@");  
+    	var dotposition=x.lastIndexOf(".");  
+    	if (x==null || x=='' || atposition<1 || dotposition<atposition+2 || dotposition+2>=x.length){  
+    		var str = '<div class="alert alert-danger alert-dismissible">'+
+    		   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Please enter a valid email address.!!</strong></div>';
+    		document.getElementById("alert").innerHTML = str;
+    	  document.getElementById("mail").focus();
+    	  return false;  
+    	  }else{
+    		  return true;
+    	  } 
+    	}
+
+
+    	function validateName(){
+    	var x=document.getElementById("name").value; 
+    	if (x == null || x ==""){  
+    		var str = '<div class="alert alert-danger alert-dismissible">'+
+    		   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Name should contain atleast 3 letters!!</strong></div>';
+    		document.getElementById("alert").innerHTML = str;
+    	  document.getElementById("name").focus();
+    	  return false;  
+    	  }else{
+    		  return true;
+    	  } 
+    	} 
+    	
+    	function validateComment(){
+        	var x=document.getElementById("comment").value; 
+        	if (x == null || x =="" || x.length < 50){
+        		var str = '<div class="alert alert-danger alert-dismissible">'+
+        		   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Comment should contain atleast 50 letters!!</strong></div>';
+        	  document.getElementById("alert").innerHTML = str;
+        	  document.getElementById("comment").focus();
+        	  return false;  
+        	  }else{
+        		  return true;
+        	  } 
+        	} 
+    
+    
+    
+    
   </script>
 
 </body>

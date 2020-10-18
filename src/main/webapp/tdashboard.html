@@ -390,7 +390,7 @@ function addSubject(){
 	$.ajax({
         type: "PUT",
         dataType: "json",
-        url: "/teacher/add/subject/" + document.getElementById("newSubject").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, ''),
+        url: "/teacher/add/subject/" + document.getElementById("newSubject").value.trim().replaceAll(/[^\w\s]/gi, '').replaceAll(/\s/g, ''),
         success: function(s) {
          
         	if (s == null ) {
@@ -741,8 +741,8 @@ function addCollection(){
 	
 	var collection = {
 			
-			"subjectCode" : document.getElementById("subjectCode").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, ''),
-			"collectionName" : document.getElementById("newCollection").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, '') 
+			"subjectCode" : document.getElementById("subjectCode").value.trim().replaceAll(/[^\w\s]/gi, '').replaceAll(/\s/g, ''),
+			"collectionName" : document.getElementById("newCollection").value.trim().replaceAll(/[^\w\s]/gi, '').replaceAll(/\s/g, '') 
 			
 	};
 	
@@ -849,7 +849,7 @@ function deleteCollection(collectionCode){
 
 
 
-
+//.replaceAll('<','&lt').replaceAll('>', '&gt').replaceAll('&','&amp').replaceAll("'",'&#39').replaceAll('"','&quot')
 
 //teacher question interface....................................................................................................................
 
@@ -895,17 +895,17 @@ function getQuestions(collectionCode){
 						for (var i = 0; i < questionList.length; i++) {
 						str += 
 							'<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title">'+
-					        '<a data-toggle="collapse" data-parent="#accordion" href="#collapse' + questionList[i].questionId + '"><strong>Question '+ i + ':  </strong> ' + questionList[i].questionString + '</a><i class="fa fa-trash pull-right" onclick="deleteQuestion(' + questionList[i].questionId + ')" style="color:red"></i></h4></div>' +
+					        '<pre><a data-toggle="collapse" data-parent="#accordion" href="#collapse' + questionList[i].questionId + '"><strong>Question '+ i + ':  </strong><xmp> ' + questionList[i].questionString + '</xmp></a><i class="fa fa-trash pull-right" onclick="deleteQuestion(' + questionList[i].questionId + ')" style="color:red"></i></h4></div>' +
 					        '<div id="collapse' + questionList[i].questionId + '" class="panel-collapse collapse"><ul class="list-group">';
 													
 						choices = questionList[i].choices.split("_mjhzsgdf_");
 						for (var j = 0; j < choices.length; j++) {
 							if (choices[j] == questionList[i].answer ) {
 								str +=
-									'<li class="list-group-item" style="background-color:lightgreen"><strong>' + j + '.</strong> ' + choices[j] + '</li>';
+									'<li class="list-group-item" style="background-color:lightgreen"><strong>' + j + '.</strong><pre><code> ' + choices[j] + '</pre></code></li>';
 							}else{
 								str +=
-									'<li class="list-group-item"><strong>' + j + '.</strong> ' + choices[j] + '</li>';
+									'<li class="list-group-item"><strong>' + j + '.</strong><xmp> ' + choices[j] + '</xmp></li>';
 							}
 							if (j == choices.length - 1) {
 									str += '</ul></div></div>';
@@ -1283,7 +1283,7 @@ function addTest(){
 	
 	var testInfo = {
 			
-				"testName":document.getElementById("testName").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, '_'),
+				"testName":document.getElementById("testName").value.trim().replaceAll(/[^\w\s]/gi, '').replaceAll(/\s/g, '_'),
 				"collectionCode":document.getElementById("collectionCode").value,
 				"subjectCode":document.getElementById("subjectCode").value,
 				"totalQuestions":document.getElementById("totalQuestions").value,

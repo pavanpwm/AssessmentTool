@@ -363,7 +363,7 @@ var temp = document.getElementsByName("subjects[]");
 	
 	var names = [];
 	for (var f of temp) {
-		names.push( f.value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, '') );
+		names.push( f.value.trim().replaceAll(/[^\w\s]/gi, '').replaceAll(/\s/g, '') );
 	 }
 	
 	var tempArray = [];

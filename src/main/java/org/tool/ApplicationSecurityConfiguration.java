@@ -79,17 +79,17 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
 				//.httpBasic();
 				
 				.formLogin()
-				.loginPage("/login.html").permitAll()
+				.loginPage("/homepage.html").permitAll()
 				.loginProcessingUrl("/login")
 				.defaultSuccessUrl("/redirect", true)
-				.failureUrl("/login.html?error=true")
+				.failureUrl("/homepage.html?loginerror=true")
 				
 				
 				.and()
 				.logout().invalidateHttpSession(true)
 				.clearAuthentication(true)
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-				.logoutSuccessUrl("/login.html").permitAll();
+				.logoutSuccessUrl("/redirect").permitAll();
 
 				
 			

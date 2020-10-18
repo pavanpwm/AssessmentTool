@@ -52,11 +52,11 @@ input[type=radio] {
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
-	}
+}
 </style>
 
 
-<body class="w3-light-grey">
+<body class="w3-light-grey" id="body">
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
@@ -108,19 +108,18 @@ input[type=radio] {
 <br>
 
 
-<div id="questionPlace" class="unselectable">
+<div id="questionPlace" class="unselectable"></div>
 
-</div>
+
+<br><br><br><div class="container"><button class="btn btn-danger pull-right" onclick="exit()" >Exit Test</button></div>
+
+
+
+
+
+
+
 <p class="footer">**Double click on an option to unselect it.</p>
-
-
-
-
-
-
-
-
-
 
 
 
@@ -372,9 +371,9 @@ function show(questionId, event){
 						
 						
 					
-					str += '</div><br>';
+					str += '</div><br><div class="container">';
 					str += '<button class="btn btn-success pull-right" onclick="save('+questionId+') " >Save & Next</button>';
-					str += '<button class="btn btn-warning pull-left" onclick="prev('+questionId+') " >Prev</button>';
+					str += '<button class="btn btn-warning pull-left" onclick="prev('+questionId+') " >Prev</button></div>';
 					
 					document.getElementById("questionPlace").innerHTML = str;
 
@@ -431,7 +430,17 @@ function prev(questionId){
 }
 
 
-
+function exit(){
+	
+	 var r = confirm("Are you sure you want to exit?");
+		
+	  if (r) {
+		  document.getElementById("body").innerHTML = 
+			  '<br><br><br><br><div class="container" style="text-align:center">**Thank you for attending this assessment. Test results will be available once the test time expires.</div>';
+	  }
+	
+	
+}
 
 
 

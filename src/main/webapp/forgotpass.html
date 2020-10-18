@@ -7,10 +7,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>Reset Password</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
@@ -41,9 +40,9 @@
           <label for="password" class="sr-only">Password</label>
           <input type="text" id="password" name="password" class="form-control" placeholder="enter new password"  disabled>
         </p>
-        <button id="fBtn" class="btn btn-lg btn-primary btn-block" onclick="sendOtp();" >Send OTP</button>
+        <button id="fBtn" class="btn btn-primary btn-block" onclick="sendOtp();" >Send OTP</button>
         <br>
-        or <a href="/login.html" >Go back</a>
+        or <a href="/" >Go back</a>
       </div>
       
       
@@ -60,6 +59,9 @@
 
 function sendOtp(){
 	
+	document.getElementById("fBtn").innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending otp..';
+	document.getElementById('fBtn').setAttribute("disabled","disabled");
+	
 	var email = {"email" : document.getElementById("username").value};
 	
 	$.ajax({
@@ -69,15 +71,10 @@ function sendOtp(){
 		url:"/forgot/password/send/otp",
 		success: function(s){
 						
-			if(s == null){
-				var str = 
-					'<div class="alert alert-danger alert-dismissible fade show">'+
-			    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-			    	'<strong>Email not registered!</strong></div>';
-				document.getElementById("alert").innerHTML = str;
-			}else if(s.message == "sent"){
+			if(s.message == "sent"){
 				document.getElementById("otp").disabled = false;
 				document.getElementById("username").disabled = true;
+				document.getElementById('fBtn').removeAttribute("disabled");
 				document.getElementById("fBtn").innerHTML = "Verify OTP";
 				document.getElementById("fBtn").setAttribute('onclick', 'verifyOtp()');
 				var str = 
@@ -85,10 +82,22 @@ function sendOtp(){
 			    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
 			    	'<strong>Please enter OTP sent to your email! </strong></div>';
 				document.getElementById("alert").innerHTML = str;
+			}else {
+				document.getElementById("fBtn").innerHTML = "Send OTP";
+				document.getElementById('fBtn').removeAttribute("disabled");
+			    document.getElementById('fBtn').removeAttribute("disabled");
+
+					var str = 
+						'<div class="alert alert-danger alert-dismissible fade show">'+
+				    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+				    	'<strong>Email not registered!</strong></div>';
+					document.getElementById("alert").innerHTML = str;
+				
 			}
 		},
 		error: function(){
-			
+			document.getElementById("fBtn").innerHTML = "Send OTP";
+			document.getElementById('fBtn').removeAttribute("disabled");
 			var str = 
 				'<div class="alert alert-danger alert-dismissible fade show">'+
 		    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
@@ -96,26 +105,26 @@ function sendOtp(){
 			document.getElementById("alert").innerHTML = str;
 		}
 	});
+	
+	
+   
 }
 
 
 function verifyOtp(){
 	
+	document.getElementById("fBtn").innerHTML = '<span class="spinner-border spinner-border-sm"></span> Verifying otp..';
+	document.getElementById('fBtn').setAttribute("disabled","disabled");
 	
 	$.ajax({
 		type: "GET",
 		url:"/forgot/password/verify/otp/" + document.getElementById("otp").value,
 		success: function(s){
 			
-			if(s == null){
-				var str = 
-					'<div class="alert alert-danger alert-dismissible fade show">'+
-			    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-			    	'<strong>OTP!</strong></div>';
-				document.getElementById("alert").innerHTML = str;
-			}else if(s.message == "verified"){
+			if(s.message == "verified"){
 				document.getElementById("otp").disabled = true;
 				document.getElementById("password").disabled = false;
+				document.getElementById('fBtn').removeAttribute("disabled");
 				document.getElementById("fBtn").innerHTML = "Update Password";
 				document.getElementById("fBtn").setAttribute('onclick', 'update()');
 				var str = 
@@ -123,10 +132,19 @@ function verifyOtp(){
 			    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
 			    	'<strong>OTP verified! Please enter new password</strong></div>';
 				document.getElementById("alert").innerHTML = str;
+			}else {
+				document.getElementById("fBtn").innerHTML = "Verify OTP";
+				document.getElementById('fBtn').removeAttribute("disabled");
+				var str = 
+					'<div class="alert alert-danger alert-dismissible fade show">'+
+			    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+			    	'<strong>OTP incorrect!</strong></div>';
+				document.getElementById("alert").innerHTML = str;
 			}
 		},
 		error: function(){
-			
+			document.getElementById("fBtn").innerHTML = "Verify OTP";
+			document.getElementById('fBtn').removeAttribute("disabled");
 			var str = 
 				'<div class="alert alert-danger alert-dismissible fade show">'+
 		    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
@@ -135,10 +153,13 @@ function verifyOtp(){
 		}
 	});
 	
-	
+
 }
 
 function update(){
+	
+	document.getElementById("fBtn").innerHTML = '<span class="spinner-border spinner-border-sm"></span> Updating password ..';
+	document.getElementById('fBtn').setAttribute("disabled","disabled");
 	
 var password = {"password" : document.getElementById("password").value};
 	
@@ -148,20 +169,23 @@ var password = {"password" : document.getElementById("password").value};
 		data: password,
 		url:"/forgot/password/update/password",
 		success: function(s){
-			if(s == null){
+		 	if(s.message == "success"){
+				alert("Password reset successful");
+				window.location.replace("http://localhost:8080/redirect");
+			}else{
+				document.getElementById("fBtn").innerHTML = "Update  Password";
+			       document.getElementById('fBtn').removeAttribute("disabled");
 				var str = 
 					'<div class="alert alert-danger alert-dismissible fade show">'+
 			    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+
 			    	'<strong>Error updating your password!</strong></div>';
 				document.getElementById("alert").innerHTML = str;
 				
-			}else if(s.message == "success"){
-				alert("Password reset successful");
-				window.location.replace("http://localhost:8080/redirect");
 			}
 		},
 		error: function(){
-			
+			document.getElementById("fBtn").innerHTML = "Update  Password";
+		       document.getElementById('fBtn').removeAttribute("disabled");
 			var str = 
 				'<div class="alert alert-danger alert-dismissible fade show">'+
 		    	'<button type="button" class="close" data-dismiss="alert">&times;</button>'+

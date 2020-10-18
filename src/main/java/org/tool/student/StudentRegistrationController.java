@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.tool.auth.User;
 import org.tool.auth.UserRepository;
+import org.tool.mail.service.MailService;
 import org.tool.reponse.ResponseMessage;
 import org.tool.teacher.TeacherSubjectEntity;
 import org.tool.teacher.TeacherSubjectRepository;
@@ -45,29 +46,25 @@ public class StudentRegistrationController {
 	@GetMapping("/generate/student/otp/{email}")
 	public ResponseMessage verifyEmail(@PathVariable("email") String email, HttpServletRequest request ) {
 		
-		if(!studRepo.existsStudentEntityByEmail(email)) {
+		if(!userRepo.existsByUsername(email)) {
 			
 			String otp = RandomStringUtils.random(5, true, false);
 			request.getSession().setAttribute("otp", otp );
 			request.getSession().setAttribute("verified", false );
-			//MailService.send(email, "One Time Password  ", " Your OTP is :  " + otp);
+			MailService.send(email, "One Time Password  ", " Your OTP is :  " + otp);
 			
-			responseMessage.setMessage("Please verify OTP that is sent to your mail");
+			responseMessage.setMessage("sent");
+			return responseMessage;
 		}else {
-			responseMessage.setMessage("Email  already exists. Please Login");
+			return null;
 		}
-		return responseMessage;
+		
 	}
 	
 	
 	@GetMapping("/verify/student/otp/{otp}")
 	public ResponseMessage verifyOtp(@PathVariable("otp") String otp, HttpServletRequest request ) {
-		
-		
-		/*	
-		 * 
-		 * 
-		 
+
 		if ( request.getSession().getAttribute("otp").equals(otp) ) {
 			request.getSession().removeAttribute("otp");
 			request.getSession().setAttribute("verified", true );			
@@ -75,11 +72,7 @@ public class StudentRegistrationController {
 		}else {
 			responseMessage.setMessage("false");
 		}
-		*
-		*/
-		
-		request.getSession().setAttribute("verified", true );
-		responseMessage.setMessage("true");
+
 		return responseMessage;
 	}
 	
@@ -95,7 +88,7 @@ public class StudentRegistrationController {
 		
 		try {
 			//check if student email already exists in student table
-		if(! studRepo.existsStudentEntityByEmail(student.getEmail())  && request.getSession().getAttribute("verified").equals(true) ) {
+		if(!userRepo.existsByUsername(student.getEmail())  && request.getSession().getAttribute("verified").equals(true) ) {
 			
 			request.getSession().removeAttribute("verified");		
 			
@@ -135,12 +128,10 @@ public class StudentRegistrationController {
 			//save student data to student table
 			studRepo.save(student);
 
-			//MailService.send(student.getEmail(), "Registration Successful ", " Your user_id : " + student.getEmail() +  "  password : " + student.getPassword());
+			MailService.send(student.getEmail(), "Registration Successful ", " Your user_id : " + student.getEmail() +  "  password : " + student.getPassword());
 									
 			responseMessage.setMessage("success");
-			responseMessage.setMessage("Registration Successful. Your User ID and Password are sent to your mail.");
 			return  responseMessage;
-			
 		  }
 			
 		} catch (Exception e) {

@@ -226,11 +226,7 @@ public class StudentEntity {
 
 
 
-	@Override
-	public String toString() {
-		return "StudentEntity [id=" + id + ", name=" + name + ", usn=" + usn + ", email=" + email + ", phone=" + phone
-				+ ", password=" + password + ", subjectList=" + subjectList + "]";
-	}
+	
 
 
 

@@ -204,13 +204,7 @@ public class TeacherEntity {
 
 
 
-	@Override
-	public String toString() {
-		return "TeacherEntity [id=" + id + ", name=" + name + ", email=" + email + ", phone=" + phone + ", password="
-				+ password + ", subjectList=" + subjectList + "]";
-	}
-	
-	
+
 	
 	
 	

@@ -85,10 +85,7 @@ public class StudentSubjectEntity {
 	}
 
 
-	@Override
-	public String toString() {
-		return "StudentSubjectEntity [id=" + id + ", name=" + name + ", studentsList=" + studentsList + "]";
-	}
+	
 
 
 	

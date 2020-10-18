@@ -337,7 +337,7 @@ public class StudentDashboardController {
 					 QuestionEntity question = 	questionRepoS.findByQuestionIdAndCollectionCode(questionId, test.getCollectionCode());
 					 question.setAnswer(null);
 					 question.setCollectionCode(null);
-					 question.setQuestionId(0);
+					 //question.setQuestionId(0);
 					 question.setTeacherUsername(null);
 					 
 				

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <title>Assesment Tool</title>
@@ -89,7 +90,6 @@ body {
     <a id = "subjects" onclick="setMeBlue(event)"  class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-book fa-fw"></i>  Subjects</a>
     <a id = "collections" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-th fa-fw"></i>   Question Collection</a> 
     <a id = "tests" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-edit fa-fw"></i>  Tests</a>
-    <a id = "profile" onclick="setMeBlue(event)" class="w3-bar-item w3-button w3-padding"><i class="fa fa-user-circle fa-fw"></i>  Profile</a>
     <a href="/logout" class="w3-bar-item w3-button w3-padding"><i class="fa fa-sign-out"></i>   Logout  </a>
   </div>
 </nav>
@@ -274,7 +274,7 @@ var setHeader = document.getElementById("headerhere").innerHTML;
 var staticContent = document.getElementById("staticContent");
 var contentPlace = document.getElementById("appendhere");
 var tableDiv = document.getElementById("tableDiv");
-var menu = ["subjects", "collections", "tests", "profile"];
+var menu = ["subjects", "collections", "tests"];
 
 
 
@@ -390,7 +390,7 @@ function addSubject(){
 	$.ajax({
         type: "PUT",
         dataType: "json",
-        url: "/teacher/add/subject/" + document.getElementById("newSubject").value,
+        url: "/teacher/add/subject/" + document.getElementById("newSubject").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, ''),
         success: function(s) {
          
         	if (s == null ) {
@@ -741,8 +741,8 @@ function addCollection(){
 	
 	var collection = {
 			
-			"subjectCode" : document.getElementById("subjectCode").value,
-			"collectionName" : document.getElementById("newCollection").value 
+			"subjectCode" : document.getElementById("subjectCode").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, ''),
+			"collectionName" : document.getElementById("newCollection").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, '') 
 			
 	};
 	
@@ -1283,7 +1283,7 @@ function addTest(){
 	
 	var testInfo = {
 			
-				"testName":document.getElementById("testName").value,
+				"testName":document.getElementById("testName").value.trim().replace(/[^\w\s]/gi, '').replace(/\s/g, '_'),
 				"collectionCode":document.getElementById("collectionCode").value,
 				"subjectCode":document.getElementById("subjectCode").value,
 				"totalQuestions":document.getElementById("totalQuestions").value,

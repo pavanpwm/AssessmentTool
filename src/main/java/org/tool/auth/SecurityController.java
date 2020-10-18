@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
+import org.tool.mail.service.MailService;
 import org.tool.reponse.ResponseMessage;
 import org.tool.student.StudentEntity;
 import org.tool.student.StudentRepository;
@@ -81,15 +82,14 @@ public class SecurityController {
 		
 		String email = request.getParameter("email");
 		
-		System.out.println(email);
 		
 		try {
 			if(studentReposSec.existsStudentEntityByEmail(email) || teacherRepoSec.existsTeacherEntityByEmail(email)) {
 				request.getSession().setAttribute("email", email );
-				String otp = RandomStringUtils.random(5, true, true);
+				String otp = RandomStringUtils.random(6, false, true);
 				request.getSession().setAttribute("otp", otp );
 				request.getSession().setAttribute("verified", false );
-				//MailService.send(email, "One Time Password  ", " Your OTP is :  " + otp);
+				MailService.send(email, "One Time Password  ", " Your OTP is :  " + otp);
 				respMessage.setMessage("sent");
 				return respMessage;
 			}
@@ -105,24 +105,16 @@ public class SecurityController {
 	
 	@GetMapping("/forgot/password/verify/otp/{otp}")
 	public ResponseMessage verifyOtp(@PathVariable("otp") String otp, HttpServletRequest request ) {
-		
-		
-		/*	
-		 * 
-		 * 
 		 
 		if ( request.getSession().getAttribute("otp").equals(otp) ) {
 			request.getSession().removeAttribute("otp");
 			request.getSession().setAttribute("verified", true );			
-			responseMessage.setMessage("verified");
+			respMessage.setMessage("verified");
 		}else {
-			responseMessage.setMessage("not verified");
+			respMessage.setMessage("not verified");
 		}
-		*
-		*/
+
 		
-		request.getSession().setAttribute("verified", true );
-		respMessage.setMessage("verified");
 		return respMessage;
 	}
 	

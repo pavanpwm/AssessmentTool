@@ -216,7 +216,6 @@
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/homepage.html"><i class="fa fa-home"></i> BACK TO HOME</a></li>
         <li><a href="/treg.html">TEACHER REGISTERATION</a></li>
-        <li><a href="/login.html">LOGIN</a></li>
       </ul>
     </div>
   </div>
@@ -228,10 +227,10 @@
 
 
 <br>
+<br>
 <br><br>
-<div id="spin"  style="text-align:center;font-size:24px" hidden>
-<i class="fa fa-circle-o-notch fa-spin" ></i>
-</div>
+<div id="alert" class="container"></div>
+
 <div id="studentRegistrationForm" class="container" >
 <h4 for="register">Student Registration:</h4>
 
@@ -262,13 +261,13 @@
     </div>
     <label for="subject">Subjects:</label>
     <div id="subjects" class="form-group">
-      <input type="text"  class="form-control" style="margin-bottom:5px" list="subjectCodes" placeholder="Enter subject code" name="subjects[]" autocomplete="off">
+      <input type="text"  class="form-control" style="margin-bottom:5px" list="subjectCodes" placeholder="Get subject codes from teacher" name="subjects[]" autocomplete="off">
     </div>
     <datalist id="subjectCodes" >
 	</datalist>
     <button onclick="appendSubjects();" class="btn btn-warning btn-sm pull-left"><i  class="fa fa-plus"></i> add</button>
 	<br>
-    <button onclick="sendOtp()" style="margin-top:10px"  class="btn btn-lg  btn-success pull-right">Submit</button>
+    <button  id="submitBtn" onclick="sendOtp()" style="margin-top:10px"  class="btn btn-lg  btn-success pull-right">Submit</button>
 </div>
 
 
@@ -288,7 +287,7 @@
       </div>
      </div>
     </div>
-    <button onclick="verifyOtp()" style="margin-top:10px"  class="btn btn-lg  btn-success pull-right">Verify</button>
+    <button id="verifyBtn" onclick="verifyOtp()" style="margin-top:10px"  class="btn btn-lg  btn-success pull-right">Verify</button>
 </div>
 
 
@@ -371,51 +370,74 @@ document.getElementById(event.target.id).parentElement.remove();
 
 function submitForm(){
 
-	var tempArray = document.getElementsByName("subjects[]");
+	var temp = document.getElementsByName("subjects[]");
+	
+	var names = [];
+	for (var f of temp) {
+		names.push( f.value.trim());
+	 }
+	
+	var tempArray = [];
+	$.each(names, function(i, el){
+	    if($.inArray(el, tempArray) === -1) tempArray.push(el);
+	});
 	
 	console.log(tempArray);
     var subjectsList = []
     for (var f of tempArray) {
      if( f != "" || f != null){
-     	subjectsList.push( { 'id' : f.value } );
+     	subjectsList.push( { "id" : f } );
       }
     }
     
 		 console.log(subjectsList);
-		    
-		    var formData = {
-		    		"name": document.getElementById("name").value,
-		    		"usn": document.getElementById("usn").value,
-				    "email": document.getElementById("email").value,
-				    "password": document.getElementById("password").value,
-				    "phone": document.getElementById("phone").value,
-				    "subjectList": subjectsList 
-		            }
-		    
-			console.log(formData);
-					
-		    $.ajax({
-				async: false,
-				type: "POST",
-				contentType : "application/json",
-				dataType: "json",
-				data: JSON.stringify(formData),
-				url: "/student/register",
-				success: function(s) {
-					
-					document.getElementById("spin").style.display = "none";
-		            alert(s.message);
-					console.log(s);
-					location.reload();
-				},
-				error: function(){
-					document.getElementById("spin").style.display = "none";
-					location.reload();
-				}
-			});
-
-    
-   
+		 
+			 var formData = {
+			    		"name": document.getElementById("name").value.trim(),
+			    		"usn": document.getElementById("usn").value.trim(),
+					    "email": document.getElementById("email").value.trim(),
+					    "password": document.getElementById("password").value.trim(),
+					    "phone": document.getElementById("phone").value.trim(),
+					    "subjectList": subjectsList 
+			            }
+			    
+				console.log(formData);
+						
+			    $.ajax({
+					async: false,
+					type: "POST",
+					contentType : "application/json",
+					dataType: "json",
+					data: JSON.stringify(formData),
+					url: "/student/register",
+					success: function(s) {
+    					if (s.message == "success") {
+    						var str = '<div class="alert alert-info alert-dismissible">'+
+    						   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Registered successfully.</strong></div>';
+    						document.getElementById("alert").innerHTML = str;
+    						document.getElementById("verifyBtn").innerHTML = 'Registered';
+    					    alert("Registration successful.");
+    					    location.reload();
+						}else{
+							var str = '<div class="alert alert-danger alert-dismissible">'+
+	    					   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>An error occured while saving your details.!!</strong></div>';
+	    					document.getElementById("alert").innerHTML = str;
+	    					document.getElementById("otp").focus();
+	    					document.getElementById("verifyBtn").innerHTML = 'Verify';
+	    				    document.getElementById("verifyBtn").disabled = false;
+						}
+    					
+    				},
+    				error: function(){
+    					var str = '<div class="alert alert-danger alert-dismissible">'+
+    					   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Error!!</strong></div>';
+    					document.getElementById("alert").innerHTML = str;
+    					document.getElementById("otp").focus();
+    					document.getElementById("verifyBtn").innerHTML = 'Verify';
+    				    document.getElementById("verifyBtn").disabled = false;
+    				}
+				});
+	 
 
 }
 
@@ -452,22 +474,51 @@ function initOptions(){
 
 function sendOtp(){
 	
-	document.getElementById("spin").style.display = "block";
+	var x = validateEmail();
+    var y = validatePassword();
+    
+    if (x && y ) {
+    	
+    
+    document.getElementById("submitBtn").innerHTML = '<i id="spin" style="text-align:center;font-size:20px" class="fa fa-circle-o-notch fa-spin" ></i> Sending OTP';
+    document.getElementById("submitBtn").disabled = true;
 	
 	$.ajax({
 		type: "GET",
 		dataType: "json",
 		url: "/generate/student/otp/" + document.getElementById("email").value,
-		success: function(s) {
-			document.getElementById("studentRegistrationForm").style.display = "none";
-			document.getElementById("spin").style.display = "none";
-			document.getElementById("otpForm").style.display = "block";
-			alert(s.message);
+success: function(s) {
+			
+			if (s.message == "sent") {
+				document.getElementById("studentRegistrationForm").style.display = "none";
+				document.getElementById("otpForm").style.display = "block";
+				
+				document.getElementById("submitBtn").innerHTML = 'Submit';
+				document.getElementById("submitBtn").disabled = false;
+				var str = '<div class="alert alert-info alert-dismissible">'+
+  						   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Please enter OTP sent to your email!</strong></div>';
+				document.getElementById("alert").innerHTML = str;
+			}else{
+				document.getElementById("submitBtn").innerHTML = 'Submit';
+				document.getElementById("submitBtn").disabled = false;
+				var str = '<div class="alert alert-danger alert-dismissible">'+
+				   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Email already exists!</strong></div>';
+				document.getElementById("alert").innerHTML = str;
+			}
+			
 		},
 		error: function(){
-			document.getElementById("spin").style.display = "none";
+			document.getElementById("submitBtn").innerHTML = 'Submit';
+			document.getElementById("submitBtn").disabled = false;
+			var str = '<div class="alert alert-danger alert-dismissible">'+
+			   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Error: Could not send OTP to your email!!</strong></div>';
+			document.getElementById("alert").innerHTML = str;
 		}
 	});
+	
+	
+	
+    }
 	
 	
 }
@@ -476,7 +527,8 @@ function sendOtp(){
 
 function verifyOtp(){
 	
-	document.getElementById("spin").style.display = "block";
+	document.getElementById("verifyBtn").innerHTML = '<i id="spin" style="text-align:center;font-size:20px" class="fa fa-circle-o-notch fa-spin" ></i> Verifying OTP';
+    document.getElementById("verifyBtn").disabled = true;
 	
 	$.ajax({
 		type: "GET",
@@ -484,22 +536,65 @@ function verifyOtp(){
 		url: "/verify/student/otp/" + document.getElementById("otp").value,
 		success: function(s) {
 			if (s.message == "false") {
+				var str = '<div class="alert alert-danger alert-dismissible">'+
+				   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Incorrect OTP!!</strong></div>';
+				document.getElementById("alert").innerHTML = str;
 				document.getElementById("otp").focus();
-				alert("Incorrect OTP");
-				document.getElementById("spin").style.display = "none";
+				document.getElementById("verifyBtn").innerHTML = 'Verify';
+			    document.getElementById("verifyBtn").disabled = false;
+				
 			}else if(s.message == "true"){
+				var str = '<div class="alert alert-info alert-dismissible">'+
+				   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>OTP verified.</strong></div>';
+				document.getElementById("alert").innerHTML = str;
+				document.getElementById("verifyBtn").innerHTML = '<i id="spin" style="text-align:center;font-size:20px" class="fa fa-circle-o-notch fa-spin" ></i> Saving Your details..';
+			    document.getElementById("verifyBtn").disabled = true;
 				submitForm();
 			}
 			
 		},
 		error: function(){
-			document.getElementById("spin").style.display = "none";
+			var str = '<div class="alert alert-danger alert-dismissible">'+
+			   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Error: Verification failed!!</strong></div>';
+			document.getElementById("alert").innerHTML = str;
+			document.getElementById("otp").focus();
+			document.getElementById("verifyBtn").innerHTML = 'Verify';
+		    document.getElementById("verifyBtn").disabled = false;
 		}
 	});
 	
 }
 
 
+
+function validateEmail(){
+	var x=document.getElementById("email").value;  
+	var atposition=x.indexOf("@");  
+	var dotposition=x.lastIndexOf(".");  
+	if (x==null || x=='' || atposition<1 || dotposition<atposition+2 || dotposition+2>=x.length){  
+		var str = '<div class="alert alert-danger alert-dismissible">'+
+		   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>Please enter a valid email address.!!</strong></div>';
+		document.getElementById("alert").innerHTML = str;
+	  document.getElementById("email").focus();
+	  return false;  
+	  }else{
+		  return true;
+	  } 
+	}
+
+
+	function validatePassword(){
+	var x=document.getElementById("password").value; 
+	if (x == null || x =="" || x.length < 6){  
+		var str = '<div class="alert alert-danger alert-dismissible">'+
+		   '<a href="#" class="close" data-dismiss="alert" aria-label="close">X</a><strong>The password should contain atleast 6 letters.!!</strong></div>';
+		document.getElementById("alert").innerHTML = str;
+	  document.getElementById("password").focus();
+	  return false;  
+	  }else{
+		  return true;
+	  } 
+	} 
 
 
 

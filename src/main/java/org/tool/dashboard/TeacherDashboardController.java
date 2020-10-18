@@ -1,7 +1,6 @@
 package org.tool.dashboard;
 
 import java.security.Principal;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -374,12 +373,6 @@ public class TeacherDashboardController {
 		try {
 			
 		int totalQuestionsavailable = questionRepo.findByTeacherUsernameAndCollectionCode(principal.getName(), test.getCollectionCode()).size();
-		
-		
-		System.out.println( LocalDate.now()  + "     " + test.getStartDate().toLocalDate() + "     " +  LocalDate.now().isEqual(test.getStartDate().toLocalDate())    );
-		System.out.println(test.getStartTime().after(Time.valueOf(LocalTime.now())));
-		System.out.println(test.getEndTime().after(test.getStartTime()) );
-		System.out.println(test.getTotalQuestions() <= totalQuestionsavailable);
 		
 		
 		if ( LocalDate.now().isEqual(test.getStartDate().toLocalDate())
